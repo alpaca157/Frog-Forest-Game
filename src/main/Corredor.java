@@ -11,21 +11,22 @@ import java.awt.Point;
  * @author Duda
  */
 public class Corredor extends Inimigo {
-    public Corredor(Point posicao) {
+    public Corredor(Point posicao, int par) {
         super(posicao, 2); // Vida inicial: 2
     }
 
     @Override
     public void mover(char[][] mapa, Point jogadorPosicao) {
-        // Movimento rápido em direção ao jogador
-        int dx = Integer.compare(jogadorPosicao.x, posicao.x);
-        int dy = Integer.compare(jogadorPosicao.y, posicao.y);
-        Point novaPosicao = new Point(posicao.x + 2 * dx, posicao.y + 2 * dy);
+        for (int i = 0; i < 2; i++) { // Move duas vezes
+            int dx = Integer.compare(jogadorPosicao.x, posicao.x);
+            int dy = Integer.compare(jogadorPosicao.y, posicao.y);
+            Point novaPosicao = new Point(posicao.x + dx, posicao.y + dy);
 
-        if (novaPosicao.x >= 0 && novaPosicao.x < mapa[0].length &&
-            novaPosicao.y >= 0 && novaPosicao.y < mapa.length &&
-            mapa[novaPosicao.y][novaPosicao.x] == ' ') {
-            posicao = novaPosicao;
+            if (novaPosicao.x >= 0 && novaPosicao.x < mapa[0].length &&
+                novaPosicao.y >= 0 && novaPosicao.y < mapa.length &&
+                mapa[novaPosicao.y][novaPosicao.x] == 'V') { // 'V' representa caminho livre
+                posicao = novaPosicao;
+            }
         }
     }
 }

@@ -4,12 +4,15 @@
  */
 package main;
 
+import java.awt.Point;
+
 /**
  *
  * @author Duda
  */
 
-public class Jogador {
+
+class Jogador {
     private int percepcao;
     private int vida;
 
@@ -28,5 +31,21 @@ public class Jogador {
 
     public void setVida(int vida) {
         this.vida = Math.max(0, Math.min(vida, 100));
+    }
+
+    Point getPosicao() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    boolean temArma() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    void usarMunicao() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    void setPosicao(Point posicao) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

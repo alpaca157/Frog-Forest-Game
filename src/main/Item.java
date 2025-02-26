@@ -10,6 +10,8 @@ import java.awt.Point;
  *
  * @author Duda
  */
+import java.awt.Point;
+
 class Item {
     private String nome;
     private Point posicao;
@@ -24,6 +26,6 @@ class Item {
     }
 
     public Point getPosicao() {
-        return posicao; // Retorna a posição do item
+        return posicao;
     }
 }

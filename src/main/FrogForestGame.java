@@ -8,6 +8,7 @@ package main;
  *
  * @author Duda
  */
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -26,10 +27,14 @@ public class FrogForestGame extends JFrame {
     private java.util.List<Item> inventario;
 
     public FrogForestGame() {
-        setTitle("Frog Forest - O Apocalipse do Cordyceps");
+        setTitle("Frog Forest Apocalipse");
         setSize(800, 800);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+
+        // Garante que o frame seja focável
+        setFocusable(true);
+        requestFocusInWindow();
 
         // Inicializa as listas
         inimigos = new ArrayList<>();
@@ -39,37 +44,113 @@ public class FrogForestGame extends JFrame {
     }
 
     private void showWelcomeScreen() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        JPanel panel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                ImageIcon backgroundImage = new ImageIcon("imagens/wellcomescreen.jpg"); // Substituir pelo caminho correto
+                g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
+            }
+        };
+        panel.setLayout(new BorderLayout());
 
-        JLabel title = new JLabel("Frog Forest - O Apocalipse do Cordyceps");
-        title.setFont(new Font("Arial", Font.BOLD, 24));
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JLabel titleLabel = new JLabel("Frog Forest Apocalipse", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 36));
+        titleLabel.setForeground(Color.WHITE);
 
-        JLabel difficultyLabel = new JLabel("Escolha a dificuldade:");
-        difficultyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JPanel centerPanel = new JPanel(new GridBagLayout());
+        centerPanel.setOpaque(false);
+        centerPanel.add(titleLabel);
 
-        String[] difficulties = {"Fácil", "Médio", "Difícil"};
-        JComboBox<String> difficultyBox = new JComboBox<>(difficulties);
+        panel.add(centerPanel, BorderLayout.CENTER);
+
+        JPanel bottomPanel = new JPanel(new GridBagLayout());
+        bottomPanel.setOpaque(false);
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        JLabel difficultyLabel = new JLabel("Escolha a dificuldade:", SwingConstants.CENTER);
+        difficultyLabel.setFont(new Font("Arial", Font.PLAIN, 24));
+        difficultyLabel.setForeground(Color.WHITE);
+
+        JButton easyButton = new JButton("Fácil");
+        JButton mediumButton = new JButton("Médio");
+        JButton hardButton = new JButton("Difícil");
+
+        easyButton.addActionListener(e -> showMainMenu(0));
+        mediumButton.addActionListener(e -> showMainMenu(1));
+        hardButton.addActionListener(e -> showMainMenu(2));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.CENTER;
+
+        bottomPanel.add(difficultyLabel, gbc);
+
+        gbc.gridy = 1;
+        bottomPanel.add(easyButton, gbc);
+
+        gbc.gridy = 2;
+        bottomPanel.add(mediumButton, gbc);
+
+        gbc.gridy = 3;
+        bottomPanel.add(hardButton, gbc);
+
+        panel.add(bottomPanel, BorderLayout.SOUTH);
+
+        setContentPane(panel);
+        revalidate();
+    }
+
+    private void showMainMenu(int difficultyIndex) {
+        JPanel panel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                ImageIcon backgroundImage = new ImageIcon("imagens/wellcomescreen.jpg"); // Substituir pelo caminho correto
+                g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
+            }
+        };
+        panel.setLayout(new BorderLayout());
+
+        JLabel titleLabel = new JLabel("Frog Forest Apocalipse", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 36));
+        titleLabel.setForeground(Color.WHITE);
+
+        JPanel centerPanel = new JPanel(new GridBagLayout());
+        centerPanel.setOpaque(false);
+        centerPanel.add(titleLabel);
+
+        panel.add(centerPanel, BorderLayout.CENTER);
+
+        JPanel bottomPanel = new JPanel(new GridBagLayout());
+        bottomPanel.setOpaque(false);
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JButton playButton = new JButton("Jogar");
         JButton debugButton = new JButton("DEBUG");
         JButton exitButton = new JButton("Sair");
 
-        playButton.addActionListener(e -> startGame(false, difficultyBox.getSelectedIndex()));
-        debugButton.addActionListener(e -> startGame(true, difficultyBox.getSelectedIndex()));
+        playButton.addActionListener(e -> startGame(false, difficultyIndex));
+        debugButton.addActionListener(e -> startGame(true, difficultyIndex));
         exitButton.addActionListener(e -> System.exit(0));
 
-        panel.add(Box.createRigidArea(new Dimension(0, 20)));
-        panel.add(title);
-        panel.add(Box.createRigidArea(new Dimension(0, 20)));
-        panel.add(difficultyLabel);
-        panel.add(difficultyBox);
-        panel.add(Box.createRigidArea(new Dimension(0, 20)));
-        panel.add(playButton);
-        panel.add(debugButton);
-        panel.add(exitButton);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.CENTER;
+
+        bottomPanel.add(playButton, gbc);
+
+        gbc.gridy = 1;
+        bottomPanel.add(debugButton, gbc);
+
+        gbc.gridy = 2;
+        bottomPanel.add(exitButton, gbc);
+
+        panel.add(bottomPanel, BorderLayout.SOUTH);
 
         setContentPane(panel);
         revalidate();
@@ -84,8 +165,7 @@ public class FrogForestGame extends JFrame {
             default -> 2;
         };
         jogador = new Jogador(playerPerception);
-        inimigos = new ArrayList<>();
-        inventario = new ArrayList<>();
+        inimigos.clear();
 
         loadRandomMap();
         initGameInterface();
@@ -108,15 +188,19 @@ public class FrogForestGame extends JFrame {
                 String line = br.readLine();
                 for (int j = 0; j < MAP_SIZE; j++) {
                     gameMap[i][j] = line.charAt(j);
-                    switch (gameMap[i][j]) {
-                        case 'P' -> playerPosition = new Point(j, i);
-                        case 'S' -> inimigos.add(new Perseguidor(new Point(j, i)));
-                        case 'E' -> inimigos.add(new Estalador(new Point(j, i)));
-                        case 'C' -> inimigos.add(new Corredor(new Point(j, i)));
-                        case 'B' -> inimigos.add(new Baiacu(new Point(j, i)));
-                        case 'I' -> inventario.add(new Item("Medicamento", new Point(j, i)));
-                        default -> {
-                        }
+
+                    if (gameMap[i][j] == 'P') {
+                        playerPosition = new Point(j, i);
+                    } else if (gameMap[i][j] == 'S') {
+                        inimigos.add(new Perseguidor(new Point(j, i), 50));
+                    } else if (gameMap[i][j] == 'E') {
+                        inimigos.add(new Estalador(new Point(j, i), 50));
+                    } else if (gameMap[i][j] == 'C') {
+                        inimigos.add(new Corredor(new Point(j, i), 50));
+                    } else if (gameMap[i][j] == 'B') {
+                        inimigos.add(new Baiacu(new Point(j, i), 80));
+                    } else if (gameMap[i][j] == 'I') {
+                        inventario.add(new Item("Medicamento", new Point(j, i)));
                     }
                 }
             }
@@ -127,6 +211,11 @@ public class FrogForestGame extends JFrame {
     }
 
     private void initGameInterface() {
+        JPanel mainPanel = new JPanel(new BorderLayout());
+
+        JPanel statusPanel = createStatusPanel();
+        mainPanel.add(statusPanel, BorderLayout.NORTH);
+
         gamePanel = new JPanel(new GridLayout(MAP_SIZE, MAP_SIZE));
         mapLabels = new JLabel[MAP_SIZE][MAP_SIZE];
 
@@ -137,113 +226,208 @@ public class FrogForestGame extends JFrame {
                 cellLabel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
                 cellLabel.setHorizontalAlignment(SwingConstants.CENTER);
                 cellLabel.setOpaque(true);
-                cellLabel.setBackground(Color.WHITE);
 
                 mapLabels[i][j] = cellLabel;
                 gamePanel.add(cellLabel);
             }
         }
 
-        updateMapDisplay();
-
-        JPanel sidePanel = new JPanel();
-        sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
-        sidePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        JLabel healthLabel = new JLabel("Vida: " + jogador.getVida());
-        JLabel perceptionLabel = new JLabel("Percepção: " + jogador.getPercepcao());
-
-        sidePanel.add(healthLabel);
-        sidePanel.add(perceptionLabel);
-
-        JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.add(gamePanel, BorderLayout.CENTER);
-        mainPanel.add(sidePanel, BorderLayout.EAST);
 
-        setContentPane(mainPanel);
+        updateMapDisplay();
         addKeyListener(new MovementHandler());
         setFocusable(true);
-        requestFocusInWindow(); // Garante que o JFrame tenha o foco
+        setContentPane(mainPanel);
         revalidate();
     }
 
-    private void updateMapDisplay() {
+    private JPanel createStatusPanel() {
+        JPanel statusPanel = new JPanel();
+        statusPanel.setLayout(new GridLayout(1, 2));
+        JLabel healthLabel = new JLabel("Vida: " + jogador.getVida() + "%");
+        JLabel perceptionLabel = new JLabel("Percepção: " + jogador.getPercepcao());
+        statusPanel.add(healthLabel);
+        statusPanel.add(perceptionLabel);
+        return statusPanel;
+    }
+
+    void updateMapDisplay() {
         for (int i = 0; i < MAP_SIZE; i++) {
             for (int j = 0; j < MAP_SIZE; j++) {
+                char cell = gameMap[i][j];
+
                 if (debugMode || (i == playerPosition.y && j == playerPosition.x)) {
-                    mapLabels[i][j].setText(String.valueOf(gameMap[i][j]));
-                    mapLabels[i][j].setBackground(Color.WHITE); // Define a cor de fundo para caminhos visíveis
+                    mapLabels[i][j].setText(String.valueOf(cell));
+                } else if (cell == 'S' || cell == 'E' || cell == 'C' || cell == 'B') {
+                    final int currentI = i;
+                    final int currentJ = j;
+
+                    boolean inimigoPresente = inimigos.stream()
+                            .anyMatch(inimigo -> inimigo.getPosicao().equals(new Point(currentJ, currentI)));
+
+                    if (cell == 'S' && !debugMode) {
+                        mapLabels[i][j].setText("?"); // Oculta o Perseguidor no modo normal
+                    } else {
+                        mapLabels[i][j].setText(inimigoPresente ? String.valueOf(cell) : "?");
+                    }
+                } else if (cell == 'V') {
+                    mapLabels[i][j].setText(" ");
                 } else {
                     mapLabels[i][j].setText("?");
-                    mapLabels[i][j].setBackground(Color.GREEN); // Define a cor de fundo para áreas desconhecidas
                 }
             }
         }
     }
 
-private class MovementHandler extends KeyAdapter {
-    @Override
-    public void keyPressed(KeyEvent e) {
-        int key = e.getKeyCode();
-        int x = playerPosition.x;
-        int y = playerPosition.y;
+    char[][] getGameMap() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 
-        switch (key) {
-            case KeyEvent.VK_UP -> y = Math.max(0, y - 1);
-            case KeyEvent.VK_DOWN -> y = Math.min(MAP_SIZE - 1, y + 1);
-            case KeyEvent.VK_LEFT -> x = Math.max(0, x - 1);
-            case KeyEvent.VK_RIGHT -> x = Math.min(MAP_SIZE - 1, x + 1);
-        }
+    private class MovementHandler extends KeyAdapter {
+        @Override
+        public void keyPressed(KeyEvent e) {
+            int key = e.getKeyCode();
+            int x = playerPosition.x;
+            int y = playerPosition.y;
 
-        // Verifica se a nova posição é válida (não é uma parede)
-        if (gameMap[y][x] != '#') {
-            boolean collisionWithEnemy = false;
-
-            // Verifica colisão com inimigos
-            for (Inimigo inimigo : inimigos) {
-                if (inimigo.getPosicao().equals(new Point(x, y))) {
-                    iniciarCombate(inimigo); // Inicia combate ao colidir com um inimigo
-                    collisionWithEnemy = true;
-                    break;
-                }
+            switch (key) {
+                case KeyEvent.VK_UP -> y = Math.max(0, y - 1);
+                case KeyEvent.VK_DOWN -> y = Math.min(MAP_SIZE - 1, y + 1);
+                case KeyEvent.VK_LEFT -> x = Math.max(0, x - 1);
+                case KeyEvent.VK_RIGHT -> x = Math.min(MAP_SIZE - 1, x + 1);
             }
 
-            if (!collisionWithEnemy) {
-                playerPosition.setLocation(x, y); // Atualiza a posição do jogador
+            if (gameMap[y][x] != '#') {
+                playerPosition.setLocation(x, y);
                 updateMapDisplay();
-                checkForItem(x, y); // Verifica se há itens na nova posição
-                moveEnemies(); // Move os inimigos após o jogador se mover
+                checkForItem(x, y);
+                checkForCombat(x, y);
+                moveEnemies();
             }
         }
     }
-}
 
     private void moveEnemies() {
         for (Inimigo inimigo : inimigos) {
-            inimigo.mover(gameMap, playerPosition);
+            if (inimigo instanceof Corredor) {
+                Point posicaoAtual = inimigo.getPosicao();
+                Point novaPosicao = calcularNovaPosicao(posicaoAtual, jogador.getPosicao());
+                if (isValidMove(novaPosicao)) {
+                    inimigo.setPosicao(novaPosicao);
+                    novaPosicao = calcularNovaPosicao(novaPosicao, jogador.getPosicao());
+                    if (isValidMove(novaPosicao)) {
+                        inimigo.setPosicao(novaPosicao);
+                    }
+                }
+            } else {
+                Point posicaoAtual = inimigo.getPosicao();
+                Point novaPosicao = calcularNovaPosicao(posicaoAtual, jogador.getPosicao());
+                if (isValidMove(novaPosicao)) {
+                    inimigo.setPosicao(novaPosicao);
+                }
+            }
         }
-        updateMapDisplay(); // Atualiza o mapa após os inimigos se moverem
+        updateMapDisplay();
+    }
+
+    private Point calcularNovaPosicao(Point posicaoAtual, Point jogadorPosicao) {
+        int dx = Integer.compare(jogadorPosicao.x, posicaoAtual.x);
+        int dy = Integer.compare(jogadorPosicao.y, posicaoAtual.y);
+        return new Point(posicaoAtual.x + dx, posicaoAtual.y + dy);
+    }
+
+    private boolean isValidMove(Point posicao) {
+        return posicao.x >= 0 && posicao.x < MAP_SIZE &&
+               posicao.y >= 0 && posicao.y < MAP_SIZE &&
+               gameMap[posicao.y][posicao.x] != '#';
     }
 
     private void checkForItem(int x, int y) {
-      Iterator<Item> it = inventario.iterator();
-      while (it.hasNext()) {
-        Item item = it.next();
-        if (item.getPosicao().equals(new Point(x, y))) {
-            JOptionPane.showMessageDialog(this, "Você encontrou um " + item.getNome() + "!");
-            it.remove(); // Remove o item do inventário
-            break;
+        Iterator<Item> it = inventario.iterator();
+        while (it.hasNext()) {
+            Item item = it.next();
+            if (item.getPosicao().equals(new Point(x, y))) {
+                String nomeItem = item.getNome();
+                if (nomeItem.equals("Medicamento")) {
+                    int opcao = JOptionPane.showOptionDialog(
+                            this,
+                            "Você encontrou um Medicamento! Deseja usar agora ou guardar?",
+                            "Item Encontrado",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE,
+                            null,
+                            new String[]{"Curar", "Guardar"},
+                            "Curar"
+                    );
+                    if (opcao == JOptionPane.YES_OPTION) {
+                        jogador.setVida(Math.min(100, jogador.getVida() + 50));
+                    } else {
+                        inventario.add(new Item("Medicamento Guardado", new Point(-1, -1)));
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this, "Você encontrou um " + nomeItem + "!");
+                }
+                it.remove();
+                break;
+            }
         }
     }
-}
 
     private void checkForCombat(int x, int y) {
         for (Inimigo inimigo : inimigos) {
             if (inimigo.getPosicao().equals(new Point(x, y))) {
                 iniciarCombate(inimigo);
-                return; // Sai do loop após iniciar o combate
+                break;
             }
         }
+    }
+
+    public void removerInimigo(Inimigo inimigo) {
+        inimigos.remove(inimigo);
+        updateMapDisplay();
+    }
+
+    public boolean verificarVitoria() {
+        return inimigos.isEmpty();
+    }
+
+    public void exibirTelaVitoria() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+
+        JLabel titleLabel = new JLabel("Você venceu o jogo!", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 36));
+        titleLabel.setForeground(Color.WHITE);
+        panel.add(titleLabel, BorderLayout.NORTH);
+
+        JPanel optionsPanel = new JPanel();
+        optionsPanel.setOpaque(false);
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        optionsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        JButton restartButton = new JButton("Reiniciar Jogo");
+        JButton newGameButton = new JButton("Novo Jogo");
+
+        restartButton.addActionListener(e -> reiniciarJogo());
+        newGameButton.addActionListener(e -> novoJogo());
+
+        optionsPanel.add(restartButton);
+        optionsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        optionsPanel.add(newGameButton);
+
+        panel.add(optionsPanel, BorderLayout.CENTER);
+
+        setContentPane(panel);
+        revalidate();
+    }
+
+    private void reiniciarJogo() {
+        loadRandomMap();
+        initGameInterface();
+    }
+
+    private void novoJogo() {
+        showWelcomeScreen();
     }
 
     private void iniciarCombate(Inimigo inimigo) {
