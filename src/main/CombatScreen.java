@@ -41,7 +41,7 @@ class CombatScreen extends JDialog {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                ImageIcon backgroundImage = new ImageIcon("image/screen1.gif"); // Substitua pelo caminho correto
+                ImageIcon backgroundImage = new ImageIcon("image/screen2.jpg"); // Substitua pelo caminho correto
                 g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
             }
         };
@@ -76,19 +76,19 @@ class CombatScreen extends JDialog {
         centerPanel.setLayout(new GridLayout(1, 2));
 
         playerLabel = new JLabel();
-        playerLabel.setIcon(new ImageIcon("image/fwaqfc.jpg")); // Imagem do jogador
+        playerLabel.setIcon(new ImageIcon("image/player.png")); // Imagem do jogador
         playerLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
         enemyLabel = new JLabel();
         // Define a imagem do inimigo com base no tipo
         if (inimigo instanceof Perseguidor) {
-            enemyLabel.setIcon(new ImageIcon("imagens/perseguidor_combat.png"));
+            enemyLabel.setIcon(new ImageIcon("image/enemy1.png"));
         } else if (inimigo instanceof Estalador) {
-            enemyLabel.setIcon(new ImageIcon("imagens/estalador_combat.png"));
+            enemyLabel.setIcon(new ImageIcon("image/enemy2.png"));
         } else if (inimigo instanceof Corredor) {
-            enemyLabel.setIcon(new ImageIcon("imagens/corredor_combat.png"));
+            enemyLabel.setIcon(new ImageIcon("image/enemy3.png"));
         } else if (inimigo instanceof Baiacu) {
-            enemyLabel.setIcon(new ImageIcon("imagens/baiacu_combat.png"));
+            enemyLabel.setIcon(new ImageIcon("image/enemy4.png"));
         }
         enemyLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
@@ -232,10 +232,10 @@ class CombatScreen extends JDialog {
     private void animateAttack(JLabel character, Runnable onFinish) {
         int frames = 4;
         String[] attackFrames = {
-                "imagens/attack_frame1.png",
-                "imagens/attack_frame2.png",
-                "imagens/attack_frame3.png",
-                "imagens/attack_frame4.png"
+                "image/player.png",
+                "image/player2.png",
+                "image/player3.png",
+                "image/player.png"
         };
 
         animationTimer = new Timer();
@@ -247,7 +247,7 @@ class CombatScreen extends JDialog {
                 if (currentFrame >= frames) {
                     animationTimer.cancel();
                     SwingUtilities.invokeLater(onFinish);
-                    character.setIcon(new ImageIcon("imagens/player_combat.png")); // Volta ao estado original
+                    character.setIcon(new ImageIcon("image/player.png")); // Volta ao estado original
                 } else {
                     ImageIcon frameIcon = new ImageIcon(attackFrames[currentFrame]);
                     character.setIcon(frameIcon);
@@ -260,10 +260,10 @@ class CombatScreen extends JDialog {
     private void animateHeal(JLabel character, Runnable onFinish) {
         int frames = 4;
         String[] healFrames = {
-                "imagens/heal_frame1.png",
-                "imagens/heal_frame2.png",
-                "imagens/heal_frame3.png",
-                "imagens/heal_frame4.png"
+                "image/player.png",
+                "image/playerc1.png",
+                "image/playerc2.png",
+                "image/playerc3.png"
         };
 
         animationTimer = new Timer();
@@ -275,7 +275,7 @@ class CombatScreen extends JDialog {
                 if (currentFrame >= frames) {
                     animationTimer.cancel();
                     SwingUtilities.invokeLater(onFinish);
-                    character.setIcon(new ImageIcon("imagens/player_combat.png")); // Volta ao estado original
+                    character.setIcon(new ImageIcon("image/player.png")); // Volta ao estado original
                 } else {
                     ImageIcon frameIcon = new ImageIcon(healFrames[currentFrame]);
                     character.setIcon(frameIcon);

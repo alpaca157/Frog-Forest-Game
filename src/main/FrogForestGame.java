@@ -162,20 +162,20 @@ public class FrogForestGame extends JFrame {
         revalidate();
     }
 
-    private void startGame(boolean debugMode, int difficultyIndex) {
-        this.debugMode = debugMode;
-        int playerPerception = switch (difficultyIndex) {
-            case 0 -> 3; // Fácil
-            case 1 -> 2; // Médio
-            case 2 -> 1; // Difícil
-            default -> 2;
-        };
-        jogador = new Jogador(playerPerception);
-        inimigos.clear();
+private void startGame(boolean debugMode, int difficultyIndex) {
+    this.debugMode = debugMode;
+    int playerPerception = switch (difficultyIndex) {
+        case 0 -> 3; // Fácil
+        case 1 -> 2; // Médio
+        case 2 -> 1; // Difícil
+        default -> 2;
+    };
+    jogador = new Jogador(playerPerception);
+    inimigos.clear();
 
-        loadRandomMap();
-        initGameInterface();
-    }
+    loadRandomMap();
+    initGameInterface();
+}
 
     private void loadRandomMap() {
         File mapDir = new File("maps");
@@ -202,10 +202,10 @@ public class FrogForestGame extends JFrame {
 
                     // Instanciação dos inimigos com vida específica
                     switch (gameMap[i][j]) {
-                        case ENEMY_S -> inimigos.add(new Perseguidor(new Point(j, i), 30)); // Vida: 30%
-                        case ENEMY_E -> inimigos.add(new Estalador(new Point(j, i), 50)); // Vida: 50%
-                        case ENEMY_C -> inimigos.add(new Corredor(new Point(j, i), 50)); // Vida: 50%
-                        case ENEMY_B -> inimigos.add(new Baiacu(new Point(j, i), 80)); // Vida: 80%
+                        case ENEMY_S -> inimigos.add(new Perseguidor(new Point(j, i), 20)); // Vida: 20%
+                        case ENEMY_E -> inimigos.add(new Estalador(new Point(j, i), 40)); // Vida: 40%
+                        case ENEMY_C -> inimigos.add(new Corredor(new Point(j, i), 40)); // Vida: 40%
+                        case ENEMY_B -> inimigos.add(new Baiacu(new Point(j, i), 70)); // Vida: 70%
                         case ITEM -> inventario.add(new Item("Medicamento", new Point(j, i)));
                         default -> {
                         }
@@ -259,34 +259,54 @@ public class FrogForestGame extends JFrame {
         return statusPanel;
     }
 
-    void updateMapDisplay() {
-        for (int i = 0; i < MAP_SIZE; i++) {
-            for (int j = 0; j < MAP_SIZE; j++) {
-                char cell = gameMap[i][j];
+void updateMapDisplay() {
+    for (int i = 0; i < MAP_SIZE; i++) {
+        for (int j = 0; j < MAP_SIZE; j++) {
+            JLabel cellLabel = mapLabels[i][j];
+            char cell = gameMap[i][j];
 
-                if (debugMode || (i == playerPosition.y && j == playerPosition.x)) {
-                    mapLabels[i][j].setText(String.valueOf(cell));
-                } else if (cell == ENEMY_S || cell == ENEMY_E || cell == ENEMY_C || cell == ENEMY_B) {
-                    final int currentI = i;
-                    final int currentJ = j;
+            // Verifica se a célula está dentro da visão do jogador
+            boolean isVisible = isCellVisible(i, j);
 
-                    boolean inimigoPresente = inimigos.stream()
-                            .anyMatch(inimigo -> inimigo.getPosicao().equals(new Point(currentJ, currentI)));
-
-                    if (cell == ENEMY_S && !debugMode) {
-                        mapLabels[i][j].setText("?"); // Oculta o Perseguidor no modo normal
-                    } else {
-                        mapLabels[i][j].setText(inimigoPresente ? String.valueOf(cell) : "?");
-                    }
-                } else if (cell == PATH) {
-                    mapLabels[i][j].setText(" ");
-                } else {
-                    mapLabels[i][j].setText("?");
+            if (isVisible || debugMode) {
+                // Define a imagem com base no caractere do mapa
+                ImageIcon icon = null;
+                switch (cell) {
+                    case PLAYER -> icon = new ImageIcon("image/player.png");
+                    case WALL -> icon = new ImageIcon("image/tree.png");
+                    case ENEMY_S -> icon = new ImageIcon("image/enemy1.png");
+                    case ENEMY_E -> icon = new ImageIcon("image/enemy2.png");
+                    case ENEMY_C -> icon = new ImageIcon("image/enemy3.png");
+                    case ENEMY_B -> icon = new ImageIcon("image/enemy4.png");
+                    case ITEM -> icon = new ImageIcon("image/item.png");
+                    case PATH -> icon = new ImageIcon("image/path.png");
+                    default -> icon = new ImageIcon("image/bush.png");
                 }
+                cellLabel.setIcon(icon);
+
+                // Oculta o Perseguidor se não estiver no modo DEBUG
+                if (cell == ENEMY_S && !debugMode) {
+                    cellLabel.setIcon(new ImageIcon("image/bush.png"));
+                }
+            } else {
+                // Cobre a célula com arbustos se não estiver visível
+                cellLabel.setIcon(new ImageIcon("image/bush.png"));
             }
         }
     }
 
+    // Atualiza a posição do jogador
+    mapLabels[playerPosition.y][playerPosition.x].setIcon(new ImageIcon("image/player.png"));
+}
+
+private boolean isCellVisible(int row, int col) {
+    int perception = jogador.getPercepcao();
+    int playerRow = playerPosition.y;
+    int playerCol = playerPosition.x;
+
+    // Verifica se a célula está dentro do raio de percepção do jogador
+    return Math.abs(row - playerRow) <= perception && Math.abs(col - playerCol) <= perception;
+}
     char[][] getGameMap() {
         return gameMap;
     }
@@ -320,27 +340,27 @@ public class FrogForestGame extends JFrame {
                 .anyMatch(inimigo -> inimigo.getPosicao().equals(posicao));
     }
 
-    private void moveEnemies() {
-        for (Inimigo inimigo : inimigos) {
-            if (!(inimigo instanceof Baiacu)) { // Baiacu não se move
-                Point posicaoAtual = inimigo.getPosicao();
-                Point novaPosicao = calcularNovaPosicao(posicaoAtual, jogador.getPosicao());
+private void moveEnemies() {
+    for (Inimigo inimigo : inimigos) {
+        if (!(inimigo instanceof Baiacu)) { // Baiacu não se move
+            Point posicaoAtual = inimigo.getPosicao();
+            Point novaPosicao = calcularNovaPosicao(posicaoAtual, jogador.getPosicao());
 
-                if (isValidMove(novaPosicao) && !isPositionOccupied(novaPosicao)) {
-                    inimigo.setPosicao(novaPosicao);
+            if (isValidMove(novaPosicao) && !isPositionOccupied(novaPosicao)) {
+                inimigo.setPosicao(novaPosicao);
 
-                    // Corredor move duas vezes
-                    if (inimigo instanceof Corredor) {
-                        novaPosicao = calcularNovaPosicao(novaPosicao, jogador.getPosicao());
-                        if (isValidMove(novaPosicao) && !isPositionOccupied(novaPosicao)) {
-                            inimigo.setPosicao(novaPosicao);
-                        }
+                // Corredor move duas vezes
+                if (inimigo instanceof Corredor) {
+                    novaPosicao = calcularNovaPosicao(novaPosicao, jogador.getPosicao());
+                    if (isValidMove(novaPosicao) && !isPositionOccupied(novaPosicao)) {
+                        inimigo.setPosicao(novaPosicao);
                     }
                 }
             }
         }
-        updateMapDisplay();
     }
+    updateMapDisplay();
+}
 
     private Point calcularNovaPosicao(Point posicaoAtual, Point jogadorPosicao) {
         int dx = Integer.compare(jogadorPosicao.x, posicaoAtual.x);
