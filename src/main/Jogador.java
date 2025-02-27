@@ -4,21 +4,27 @@
  */
 package main;
 
-import java.awt.Point;
-
 /**
  *
  * @author Duda
  */
 
 
+import java.awt.Point;
+
 class Jogador {
     private int percepcao;
     private int vida;
+    private Point posicao;
+    private boolean temArma;
+    private int municao;
 
     public Jogador(int percepcao) {
         this.percepcao = percepcao;
         this.vida = 100;
+        this.posicao = new Point(0, 0);
+        this.temArma = false;
+        this.municao = 0;
     }
 
     public int getPercepcao() {
@@ -33,19 +39,35 @@ class Jogador {
         this.vida = Math.max(0, Math.min(vida, 100));
     }
 
-    Point getPosicao() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public Point getPosicao() {
+        return posicao;
     }
 
-    boolean temArma() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void setPosicao(Point posicao) {
+        this.posicao = posicao;
     }
 
-    void usarMunicao() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public boolean temArma() {
+        return temArma;
     }
 
-    void setPosicao(Point posicao) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void ganharArma() {
+        this.temArma = true;
+    }
+
+    public void adicionarMunicao(int quantidade) {
+        this.municao += quantidade;
+    }
+
+    public void usarMunicao() {
+        if (this.temArma && this.municao > 0) {
+            this.municao--;
+        } else {
+            System.out.println("Você não tem arma ou munição suficiente!");
+        }
+    }
+
+    public int getMunicao() {
+        return municao;
     }
 }

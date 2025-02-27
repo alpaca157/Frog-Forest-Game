@@ -11,8 +11,8 @@ package main;
 import java.awt.Point;
 
 public abstract class Inimigo {
-    protected Point posicao;
-    protected int vida;
+    public Point posicao;
+    private int vida;
 
     public Inimigo(Point posicao, int vida) {
         this.posicao = posicao;
@@ -20,20 +20,20 @@ public abstract class Inimigo {
     }
 
     public Point getPosicao() {
-    return posicao;
-}
+        return posicao;
+    }
+
+    public void setPosicao(Point novaPosicao) {
+        this.posicao = novaPosicao;
+    }
 
     public int getVida() {
         return vida;
     }
 
     public void setVida(int vida) {
-        this.vida = Math.max(0, vida); // Vida não pode ser negativa
+        this.vida = Math.max(0, vida);
     }
 
     public abstract void mover(char[][] mapa, Point jogadorPosicao);
-
-    void setPosicao(Point novaPosicao) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
 }

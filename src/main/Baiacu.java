@@ -11,8 +11,8 @@ import java.awt.Point;
  * @author Duda
  */
 public class Baiacu extends Inimigo {
-    public Baiacu(Point posicao, int par) {
-        super(posicao, 3); // Vida inicial: 3
+    public Baiacu(Point posicao, int vida) {
+        super(posicao, vida);
     }
 
     @Override

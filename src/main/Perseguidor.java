@@ -11,8 +11,8 @@ import java.awt.Point;
  * @author Duda
  */
 public class Perseguidor extends Inimigo {
-    public Perseguidor(Point posicao, int par) {
-        super(posicao, 1); // Vida inicial: 1
+    public Perseguidor(Point posicao, int vida) {
+        super(posicao, vida);
     }
 
     @Override

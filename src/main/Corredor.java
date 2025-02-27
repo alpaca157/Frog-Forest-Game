@@ -11,8 +11,8 @@ import java.awt.Point;
  * @author Duda
  */
 public class Corredor extends Inimigo {
-    public Corredor(Point posicao, int par) {
-        super(posicao, 2); // Vida inicial: 2
+    public Corredor(Point posicao, int vida) {
+        super(posicao, vida);
     }
 
     @Override

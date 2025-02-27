@@ -23,18 +23,24 @@ public class FrogForestGame extends JFrame {
     private final int MAP_SIZE = 10;
     private char[][] gameMap;
     private Point playerPosition;
-    private java.util.List<Inimigo> inimigos;
-    private java.util.List<Item> inventario;
+    private final java.util.List<Inimigo> inimigos;
+    private final java.util.List<Item> inventario;
+
+    // Constantes para os caracteres do mapa
+    private static final char WALL = '#';
+    private static final char PATH = 'V';
+    private static final char PLAYER = 'P';
+    private static final char ENEMY_S = 'S'; // Perseguidor
+    private static final char ENEMY_E = 'E'; // Estalador
+    private static final char ENEMY_C = 'C'; // Corredor
+    private static final char ENEMY_B = 'B'; // Baiacu
+    private static final char ITEM = 'I';   // Item
 
     public FrogForestGame() {
         setTitle("Frog Forest Apocalipse");
         setSize(800, 800);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-
-        // Garante que o frame seja focável
-        setFocusable(true);
-        requestFocusInWindow();
 
         // Inicializa as listas
         inimigos = new ArrayList<>();
@@ -48,7 +54,7 @@ public class FrogForestGame extends JFrame {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                ImageIcon backgroundImage = new ImageIcon("imagens/wellcomescreen.jpg"); // Substituir pelo caminho correto
+                ImageIcon backgroundImage = new ImageIcon("image/wellcomescreen.jpg"); // Substituir pelo caminho correto
                 g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
             }
         };
@@ -108,7 +114,7 @@ public class FrogForestGame extends JFrame {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                ImageIcon backgroundImage = new ImageIcon("imagens/wellcomescreen.jpg"); // Substituir pelo caminho correto
+                ImageIcon backgroundImage = new ImageIcon("image/finalscreen.gif"); // Substituir pelo caminho correto
                 g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
             }
         };
@@ -189,18 +195,20 @@ public class FrogForestGame extends JFrame {
                 for (int j = 0; j < MAP_SIZE; j++) {
                     gameMap[i][j] = line.charAt(j);
 
-                    if (gameMap[i][j] == 'P') {
+                    // Posição inicial do jogador
+                    if (gameMap[i][j] == PLAYER) {
                         playerPosition = new Point(j, i);
-                    } else if (gameMap[i][j] == 'S') {
-                        inimigos.add(new Perseguidor(new Point(j, i), 50));
-                    } else if (gameMap[i][j] == 'E') {
-                        inimigos.add(new Estalador(new Point(j, i), 50));
-                    } else if (gameMap[i][j] == 'C') {
-                        inimigos.add(new Corredor(new Point(j, i), 50));
-                    } else if (gameMap[i][j] == 'B') {
-                        inimigos.add(new Baiacu(new Point(j, i), 80));
-                    } else if (gameMap[i][j] == 'I') {
-                        inventario.add(new Item("Medicamento", new Point(j, i)));
+                    }
+
+                    // Instanciação dos inimigos com vida específica
+                    switch (gameMap[i][j]) {
+                        case ENEMY_S -> inimigos.add(new Perseguidor(new Point(j, i), 30)); // Vida: 30%
+                        case ENEMY_E -> inimigos.add(new Estalador(new Point(j, i), 50)); // Vida: 50%
+                        case ENEMY_C -> inimigos.add(new Corredor(new Point(j, i), 50)); // Vida: 50%
+                        case ENEMY_B -> inimigos.add(new Baiacu(new Point(j, i), 80)); // Vida: 80%
+                        case ITEM -> inventario.add(new Item("Medicamento", new Point(j, i)));
+                        default -> {
+                        }
                     }
                 }
             }
@@ -258,19 +266,19 @@ public class FrogForestGame extends JFrame {
 
                 if (debugMode || (i == playerPosition.y && j == playerPosition.x)) {
                     mapLabels[i][j].setText(String.valueOf(cell));
-                } else if (cell == 'S' || cell == 'E' || cell == 'C' || cell == 'B') {
+                } else if (cell == ENEMY_S || cell == ENEMY_E || cell == ENEMY_C || cell == ENEMY_B) {
                     final int currentI = i;
                     final int currentJ = j;
 
                     boolean inimigoPresente = inimigos.stream()
                             .anyMatch(inimigo -> inimigo.getPosicao().equals(new Point(currentJ, currentI)));
 
-                    if (cell == 'S' && !debugMode) {
+                    if (cell == ENEMY_S && !debugMode) {
                         mapLabels[i][j].setText("?"); // Oculta o Perseguidor no modo normal
                     } else {
                         mapLabels[i][j].setText(inimigoPresente ? String.valueOf(cell) : "?");
                     }
-                } else if (cell == 'V') {
+                } else if (cell == PATH) {
                     mapLabels[i][j].setText(" ");
                 } else {
                     mapLabels[i][j].setText("?");
@@ -280,7 +288,7 @@ public class FrogForestGame extends JFrame {
     }
 
     char[][] getGameMap() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        return gameMap;
     }
 
     private class MovementHandler extends KeyAdapter {
@@ -307,23 +315,27 @@ public class FrogForestGame extends JFrame {
         }
     }
 
+    private boolean isPositionOccupied(Point posicao) {
+        return inimigos.stream()
+                .anyMatch(inimigo -> inimigo.getPosicao().equals(posicao));
+    }
+
     private void moveEnemies() {
         for (Inimigo inimigo : inimigos) {
-            if (inimigo instanceof Corredor) {
+            if (!(inimigo instanceof Baiacu)) { // Baiacu não se move
                 Point posicaoAtual = inimigo.getPosicao();
                 Point novaPosicao = calcularNovaPosicao(posicaoAtual, jogador.getPosicao());
-                if (isValidMove(novaPosicao)) {
+
+                if (isValidMove(novaPosicao) && !isPositionOccupied(novaPosicao)) {
                     inimigo.setPosicao(novaPosicao);
-                    novaPosicao = calcularNovaPosicao(novaPosicao, jogador.getPosicao());
-                    if (isValidMove(novaPosicao)) {
-                        inimigo.setPosicao(novaPosicao);
+
+                    // Corredor move duas vezes
+                    if (inimigo instanceof Corredor) {
+                        novaPosicao = calcularNovaPosicao(novaPosicao, jogador.getPosicao());
+                        if (isValidMove(novaPosicao) && !isPositionOccupied(novaPosicao)) {
+                            inimigo.setPosicao(novaPosicao);
+                        }
                     }
-                }
-            } else {
-                Point posicaoAtual = inimigo.getPosicao();
-                Point novaPosicao = calcularNovaPosicao(posicaoAtual, jogador.getPosicao());
-                if (isValidMove(novaPosicao)) {
-                    inimigo.setPosicao(novaPosicao);
                 }
             }
         }
@@ -339,7 +351,7 @@ public class FrogForestGame extends JFrame {
     private boolean isValidMove(Point posicao) {
         return posicao.x >= 0 && posicao.x < MAP_SIZE &&
                posicao.y >= 0 && posicao.y < MAP_SIZE &&
-               gameMap[posicao.y][posicao.x] != '#';
+               gameMap[posicao.y][posicao.x] != WALL;
     }
 
     private void checkForItem(int x, int y) {
@@ -361,14 +373,22 @@ public class FrogForestGame extends JFrame {
                     );
                     if (opcao == JOptionPane.YES_OPTION) {
                         jogador.setVida(Math.min(100, jogador.getVida() + 50));
+                        JOptionPane.showMessageDialog(this, "Você usou o medicamento e recuperou 50% de vida!");
                     } else {
-                        inventario.add(new Item("Medicamento Guardado", new Point(-1, -1)));
+                        // Adiciona o medicamento ao inventário sem modificar a lista durante a iteração
+                        SwingUtilities.invokeLater(() -> {
+                            inventario.add(new Item("Medicamento Guardado", new Point(-1, -1)));
+                            JOptionPane.showMessageDialog(this, "Você guardou o medicamento no inventário.");
+                        });
                     }
+                    // Remove o item da lista com segurança
+                    it.remove();
+                    break;
                 } else {
                     JOptionPane.showMessageDialog(this, "Você encontrou um " + nomeItem + "!");
+                    it.remove();
+                    break;
                 }
-                it.remove();
-                break;
             }
         }
     }

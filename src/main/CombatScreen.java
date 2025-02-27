@@ -23,9 +23,11 @@ class CombatScreen extends JDialog {
     private final JLabel playerLabel;
     private final JLabel enemyLabel;
     private Timer animationTimer;
+    private final FrogForestGame game;
 
     public CombatScreen(JFrame parent, Jogador jogador, Inimigo inimigo) {
         super(parent, "Combate", true);
+        this.game = (FrogForestGame) parent;
         this.jogador = jogador;
         this.inimigo = inimigo;
 
@@ -39,7 +41,7 @@ class CombatScreen extends JDialog {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                ImageIcon backgroundImage = new ImageIcon("imagens/combat_background.png"); // Substitua pelo caminho correto
+                ImageIcon backgroundImage = new ImageIcon("image/screen1.gif"); // Substitua pelo caminho correto
                 g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
             }
         };
@@ -74,11 +76,20 @@ class CombatScreen extends JDialog {
         centerPanel.setLayout(new GridLayout(1, 2));
 
         playerLabel = new JLabel();
-        playerLabel.setIcon(new ImageIcon("imagens/player_combat.png")); // Substitua pelo caminho correto
+        playerLabel.setIcon(new ImageIcon("image/fwaqfc.jpg")); // Imagem do jogador
         playerLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
         enemyLabel = new JLabel();
-        enemyLabel.setIcon(new ImageIcon("imagens/enemy_combat.png")); // Substitua pelo caminho correto
+        // Define a imagem do inimigo com base no tipo
+        if (inimigo instanceof Perseguidor) {
+            enemyLabel.setIcon(new ImageIcon("imagens/perseguidor_combat.png"));
+        } else if (inimigo instanceof Estalador) {
+            enemyLabel.setIcon(new ImageIcon("imagens/estalador_combat.png"));
+        } else if (inimigo instanceof Corredor) {
+            enemyLabel.setIcon(new ImageIcon("imagens/corredor_combat.png"));
+        } else if (inimigo instanceof Baiacu) {
+            enemyLabel.setIcon(new ImageIcon("imagens/baiacu_combat.png"));
+        }
         enemyLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
         centerPanel.add(playerLabel);
@@ -121,25 +132,25 @@ class CombatScreen extends JDialog {
                     "Mão"
             );
 
+            int dano = 0;
             if (opcao == JOptionPane.YES_OPTION) {
                 // Ataque com a mão
-                int dado = new Random().nextInt(6) + 1; // Rola um dado de 6 lados
+                int dado = new Random().nextInt(6) + 1;
                 if (dado == 6) {
-                    JOptionPane.showMessageDialog(this, "Golpe crítico! Você eliminou o inimigo.");
-                    inimigo.setVida(0);
+                    dano = inimigo.getVida(); // Golpe crítico elimina o inimigo
+                    JOptionPane.showMessageDialog(this, "Golpe crítico! Você causou " + dano + " de dano.");
                 } else {
-                    inimigo.setVida(inimigo.getVida() - 20); // Dano normal
+                    dano = 20; // Dano normal
+                    JOptionPane.showMessageDialog(this, "Você causou " + dano + " de dano.");
                 }
             } else {
                 // Ataque com revólver
                 if (jogador.temArma()) {
-                    if (inimigo instanceof Corredor) {
-                        JOptionPane.showMessageDialog(this, "Não é possível vencer corredores com o revólver.");
-                    } else if (inimigo instanceof Baiacu) {
-                        JOptionPane.showMessageDialog(this, "Não é possível ferir o baiacu sem uma arma.");
+                    if (inimigo instanceof Corredor || inimigo instanceof Baiacu) {
+                        JOptionPane.showMessageDialog(this, "Não é possível ferir este inimigo com o revólver.");
                     } else {
-                        JOptionPane.showMessageDialog(this, "Golpe crítico com revólver! Você eliminou o inimigo.");
-                        inimigo.setVida(0);
+                        dano = inimigo.getVida();
+                        JOptionPane.showMessageDialog(this, "Golpe crítico com revólver! Você causou " + dano + " de dano.");
                         jogador.usarMunicao();
                     }
                 } else {
@@ -147,6 +158,7 @@ class CombatScreen extends JDialog {
                 }
             }
 
+            inimigo.setVida(inimigo.getVida() - dano);
             turnoInimigo();
             verificarFimCombate();
         });
@@ -173,7 +185,7 @@ class CombatScreen extends JDialog {
         for (Point posicao : posicoesAdjacentes) {
             if (isValidMove(posicao)) {
                 jogador.setPosicao(posicao);
-                updateMapDisplay();
+                game.updateMapDisplay();
                 dispose(); // Fecha a tela de combate
                 return;
             }
@@ -195,16 +207,15 @@ class CombatScreen extends JDialog {
 
         if (inimigo.getVida() <= 0) {
             JOptionPane.showMessageDialog(this, "Você derrotou o inimigo!");
-            FrogForestGame parent = (FrogForestGame) getParent();
             Point inimigoPosition = inimigo.getPosicao();
 
             // Substitui a posição do inimigo por um espaço vazio (' ')
-            parent.getGameMap()[inimigoPosition.y][inimigoPosition.x] = ' ';
-            parent.removerInimigo(inimigo);
-            parent.updateMapDisplay();
+            game.getGameMap()[inimigoPosition.y][inimigoPosition.x] = ' ';
+            game.removerInimigo(inimigo);
+            game.updateMapDisplay();
 
-            if (parent.verificarVitoria()) {
-                parent.exibirTelaVitoria();
+            if (game.verificarVitoria()) {
+                game.exibirTelaVitoria();
             }
             dispose(); // Fecha a tela de combate
         } else if (jogador.getVida() <= 0) {
@@ -275,15 +286,9 @@ class CombatScreen extends JDialog {
     }
 
     private boolean isValidMove(Point posicao) {
-        FrogForestGame parent = (FrogForestGame) getParent();
-        char[][] gameMap = parent.getGameMap();
+        char[][] gameMap = game.getGameMap();
         return posicao.x >= 0 && posicao.x < gameMap[0].length &&
                posicao.y >= 0 && posicao.y < gameMap.length &&
                gameMap[posicao.y][posicao.x] != '#';
-    }
-
-    private void updateMapDisplay() {
-        FrogForestGame parent = (FrogForestGame) getParent();
-        parent.updateMapDisplay();
     }
 }
