@@ -1,1 +1,3 @@
-Projeto em desenvolvimento de jogo da diciplina de POO
+# Frog Forest Game
+Projeto de jogo em java da diciplina de POO UFPel
+*Ainda em desenvolvimento*
