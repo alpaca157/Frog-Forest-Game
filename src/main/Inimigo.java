@@ -36,4 +36,5 @@ public abstract class Inimigo {
     }
 
     public abstract void mover(char[][] mapa, Point jogadorPosicao);
+
 }

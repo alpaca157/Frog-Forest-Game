@@ -21,7 +21,7 @@ public class FrogForestGame extends JFrame {
     private JPanel gamePanel;
     private JLabel[][] mapLabels;
     private final int MAP_SIZE = 10;
-    private char[][] gameMap;
+    public char[][] gameMap;
     private Point playerPosition;
     private final java.util.List<Inimigo> inimigos;
     private final java.util.List<Item> inventario;
@@ -177,46 +177,67 @@ private void startGame(boolean debugMode, int difficultyIndex) {
     initGameInterface();
 }
 
-    private void loadRandomMap() {
-        File mapDir = new File("maps");
-        File[] mapFiles = mapDir.listFiles((dir, name) -> name.endsWith(".txt"));
+private void loadRandomMap() {
+    File mapDir = new File("maps");
+    File[] mapFiles = mapDir.listFiles((dir, name) -> name.endsWith(".txt"));
 
-        if (mapFiles == null || mapFiles.length == 0) {
-            JOptionPane.showMessageDialog(this, "Nenhum mapa encontrado na pasta 'maps'.");
-            System.exit(0);
-        }
+    if (mapFiles == null || mapFiles.length == 0) {
+        JOptionPane.showMessageDialog(this, "Nenhum mapa encontrado na pasta 'maps'.");
+        System.exit(0);
+    }
 
-        File selectedMap = mapFiles[new Random().nextInt(mapFiles.length)];
-        gameMap = new char[MAP_SIZE][MAP_SIZE];
+    File selectedMap = mapFiles[new Random().nextInt(mapFiles.length)];
+    gameMap = new char[MAP_SIZE][MAP_SIZE];
 
-        try (BufferedReader br = new BufferedReader(new FileReader(selectedMap))) {
-            for (int i = 0; i < MAP_SIZE; i++) {
-                String line = br.readLine();
-                for (int j = 0; j < MAP_SIZE; j++) {
-                    gameMap[i][j] = line.charAt(j);
+    try (BufferedReader br = new BufferedReader(new FileReader(selectedMap))) {
+        for (int i = 0; i < MAP_SIZE; i++) {
+            String line = br.readLine();
+            for (int j = 0; j < MAP_SIZE; j++) {
+                gameMap[i][j] = line.charAt(j);
 
-                    // Posição inicial do jogador
-                    if (gameMap[i][j] == PLAYER) {
-                        playerPosition = new Point(j, i);
-                    }
+                // Posição inicial do jogador
+                if (gameMap[i][j] == PLAYER) {
+                    playerPosition = new Point(j, i);
+                }
 
-                    // Instanciação dos inimigos com vida específica
-                    switch (gameMap[i][j]) {
-                        case ENEMY_S -> inimigos.add(new Perseguidor(new Point(j, i), 20)); // Vida: 20%
-                        case ENEMY_E -> inimigos.add(new Estalador(new Point(j, i), 40)); // Vida: 40%
-                        case ENEMY_C -> inimigos.add(new Corredor(new Point(j, i), 40)); // Vida: 40%
-                        case ENEMY_B -> inimigos.add(new Baiacu(new Point(j, i), 70)); // Vida: 70%
-                        case ITEM -> inventario.add(new Item("Medicamento", new Point(j, i)));
-                        default -> {
+                // Instanciação dos inimigos com vida específica
+                switch (gameMap[i][j]) {
+                    case ENEMY_S -> inimigos.add(new Perseguidor(new Point(j, i), 20)); // Vida: 20%
+                    case ENEMY_E -> inimigos.add(new Estalador(new Point(j, i), 40)); // Vida: 40%
+                    case ENEMY_C -> inimigos.add(new Corredor(new Point(j, i), 40)); // Vida: 40%
+                    case ENEMY_B -> inimigos.add(new Baiacu(new Point(j, i), 70)); // Vida: 70%
+                    case ITEM -> {
+                        // Distribuição dos itens
+                        if (inventario.stream().filter(item -> item.getNome().equals("Taco de Baseball")).count() == 0) {
+                            inventario.add(new Item("Taco de Baseball", new Point(j, i)));
+                        } else if (inventario.stream().filter(item -> item.getNome().equals("Arma")).count() == 0) {
+                            inventario.add(new Item("Arma", new Point(j, i)));
+                        } else if (inventario.stream().filter(item -> item.getNome().equals("Medicamento")).count() < 2) {
+                            inventario.add(new Item("Medicamento", new Point(j, i)));
                         }
+                    }
+                    default -> {
                     }
                 }
             }
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Erro ao carregar o mapa.");
-            System.exit(0);
         }
+    } catch (IOException e) {
+        JOptionPane.showMessageDialog(this, "Erro ao carregar o mapa.");
+        System.exit(0);
     }
+}
+    
+    private JPanel createStatusPanel() {
+    JPanel statusPanel = new JPanel();
+    statusPanel.setLayout(new GridLayout(1, 4));
+    JLabel healthLabel = new JLabel("Vida: " + jogador.getVida() + "%");
+    JLabel perceptionLabel = new JLabel("Percepção: " + jogador.getPercepcao());
+    JLabel enemiesLabel = new JLabel("Inimigos Restantes: " + inimigos.size());
+    statusPanel.add(healthLabel);
+    statusPanel.add(perceptionLabel);
+    statusPanel.add(enemiesLabel);
+    return statusPanel;
+}
 
     private void initGameInterface() {
         JPanel mainPanel = new JPanel(new BorderLayout());
@@ -249,16 +270,6 @@ private void startGame(boolean debugMode, int difficultyIndex) {
         revalidate();
     }
 
-    private JPanel createStatusPanel() {
-        JPanel statusPanel = new JPanel();
-        statusPanel.setLayout(new GridLayout(1, 2));
-        JLabel healthLabel = new JLabel("Vida: " + jogador.getVida() + "%");
-        JLabel perceptionLabel = new JLabel("Percepção: " + jogador.getPercepcao());
-        statusPanel.add(healthLabel);
-        statusPanel.add(perceptionLabel);
-        return statusPanel;
-    }
-
 void updateMapDisplay() {
     for (int i = 0; i < MAP_SIZE; i++) {
         for (int j = 0; j < MAP_SIZE; j++) {
@@ -274,7 +285,13 @@ void updateMapDisplay() {
                 switch (cell) {
                     case PLAYER -> icon = new ImageIcon("image/player.png");
                     case WALL -> icon = new ImageIcon("image/tree.png");
-                    case ENEMY_S -> icon = new ImageIcon("image/enemy1.png");
+                    case ENEMY_S -> {
+                        if (debugMode) {
+                            icon = new ImageIcon("image/enemy1.png");
+                        } else {
+                            icon = new ImageIcon("image/bush.png"); // Perseguidor invisível
+                        }
+                    }
                     case ENEMY_E -> icon = new ImageIcon("image/enemy2.png");
                     case ENEMY_C -> icon = new ImageIcon("image/enemy3.png");
                     case ENEMY_B -> icon = new ImageIcon("image/enemy4.png");
@@ -283,11 +300,6 @@ void updateMapDisplay() {
                     default -> icon = new ImageIcon("image/bush.png");
                 }
                 cellLabel.setIcon(icon);
-
-                // Oculta o Perseguidor se não estiver no modo DEBUG
-                if (cell == ENEMY_S && !debugMode) {
-                    cellLabel.setIcon(new ImageIcon("image/bush.png"));
-                }
             } else {
                 // Cobre a célula com arbustos se não estiver visível
                 cellLabel.setIcon(new ImageIcon("image/bush.png"));
@@ -300,40 +312,81 @@ void updateMapDisplay() {
 }
 
 private boolean isCellVisible(int row, int col) {
-    int perception = jogador.getPercepcao();
     int playerRow = playerPosition.y;
     int playerCol = playerPosition.x;
 
-    // Verifica se a célula está dentro do raio de percepção do jogador
-    return Math.abs(row - playerRow) <= perception && Math.abs(col - playerCol) <= perception;
+    // Verifica se a célula está na mesma linha ou coluna do jogador
+    if (row == playerRow || col == playerCol) {
+        // Verifica a direção norte
+        if (row < playerRow) {
+            for (int i = playerRow - 1; i >= row; i--) {
+                if (gameMap[i][col] == WALL || gameMap[i][col] == ENEMY_S || gameMap[i][col] == ENEMY_E || gameMap[i][col] == ENEMY_C || gameMap[i][col] == ENEMY_B || gameMap[i][col] == ITEM) {
+                    return i == row; // Visível apenas se for a célula final
+                }
+            }
+        }
+        // Verifica a direção sul
+        else if (row > playerRow) {
+            for (int i = playerRow + 1; i <= row; i++) {
+                if (gameMap[i][col] == WALL || gameMap[i][col] == ENEMY_S || gameMap[i][col] == ENEMY_E || gameMap[i][col] == ENEMY_C || gameMap[i][col] == ENEMY_B || gameMap[i][col] == ITEM) {
+                    return i == row; // Visível apenas se for a célula final
+                }
+            }
+        }
+        // Verifica a direção oeste
+        else if (col < playerCol) {
+            for (int j = playerCol - 1; j >= col; j--) {
+                if (gameMap[row][j] == WALL || gameMap[row][j] == ENEMY_S || gameMap[row][j] == ENEMY_E || gameMap[row][j] == ENEMY_C || gameMap[row][j] == ENEMY_B || gameMap[row][j] == ITEM) {
+                    return j == col; // Visível apenas se for a célula final
+                }
+            }
+        }
+        // Verifica a direção leste
+        else if (col > playerCol) {
+            for (int j = playerCol + 1; j <= col; j++) {
+                if (gameMap[row][j] == WALL || gameMap[row][j] == ENEMY_S || gameMap[row][j] == ENEMY_E || gameMap[row][j] == ENEMY_C || gameMap[row][j] == ENEMY_B || gameMap[row][j] == ITEM) {
+                    return j == col; // Visível apenas se for a célula final
+                }
+            }
+        }
+    }
+    return false; // Célula não visível
 }
+
     char[][] getGameMap() {
         return gameMap;
     }
 
-    private class MovementHandler extends KeyAdapter {
-        @Override
-        public void keyPressed(KeyEvent e) {
-            int key = e.getKeyCode();
-            int x = playerPosition.x;
-            int y = playerPosition.y;
+private class MovementHandler extends KeyAdapter {
+    @Override
+    public void keyPressed(KeyEvent e) {
+        int key = e.getKeyCode();
+        int x = playerPosition.x;
+        int y = playerPosition.y;
 
-            switch (key) {
-                case KeyEvent.VK_UP -> y = Math.max(0, y - 1);
-                case KeyEvent.VK_DOWN -> y = Math.min(MAP_SIZE - 1, y + 1);
-                case KeyEvent.VK_LEFT -> x = Math.max(0, x - 1);
-                case KeyEvent.VK_RIGHT -> x = Math.min(MAP_SIZE - 1, x + 1);
-            }
+        switch (key) {
+            case KeyEvent.VK_UP -> y = Math.max(0, y - 1);
+            case KeyEvent.VK_DOWN -> y = Math.min(MAP_SIZE - 1, y + 1);
+            case KeyEvent.VK_LEFT -> x = Math.max(0, x - 1);
+            case KeyEvent.VK_RIGHT -> x = Math.min(MAP_SIZE - 1, x + 1);
+        }
 
-            if (gameMap[y][x] != '#') {
-                playerPosition.setLocation(x, y);
-                updateMapDisplay();
-                checkForItem(x, y);
-                checkForCombat(x, y);
-                moveEnemies();
-            }
+        if (gameMap[y][x] != WALL) {
+            // Limpa a posição anterior do jogador
+            gameMap[playerPosition.y][playerPosition.x] = PATH;
+
+            // Atualiza a posição do jogador
+            playerPosition.setLocation(x, y);
+            gameMap[y][x] = PLAYER;
+
+            // Atualiza o mapa e verifica interações
+            updateMapDisplay();
+            checkForItem(x, y);
+            checkForCombat(x, y);
+            moveEnemies();
         }
     }
+}
 
     private boolean isPositionOccupied(Point posicao) {
         return inimigos.stream()
@@ -347,13 +400,20 @@ private void moveEnemies() {
             Point novaPosicao = calcularNovaPosicao(posicaoAtual, jogador.getPosicao());
 
             if (isValidMove(novaPosicao) && !isPositionOccupied(novaPosicao)) {
+                // Limpa a posição atual do inimigo
+                gameMap[posicaoAtual.y][posicaoAtual.x] = PATH;
+
+                // Move o inimigo para a nova posição
                 inimigo.setPosicao(novaPosicao);
+                gameMap[novaPosicao.y][novaPosicao.x] = getEnemyChar(inimigo);
 
                 // Corredor move duas vezes
                 if (inimigo instanceof Corredor) {
                     novaPosicao = calcularNovaPosicao(novaPosicao, jogador.getPosicao());
                     if (isValidMove(novaPosicao) && !isPositionOccupied(novaPosicao)) {
+                        gameMap[inimigo.getPosicao().y][inimigo.getPosicao().x] = PATH;
                         inimigo.setPosicao(novaPosicao);
+                        gameMap[novaPosicao.y][novaPosicao.x] = getEnemyChar(inimigo);
                     }
                 }
             }
@@ -362,25 +422,35 @@ private void moveEnemies() {
     updateMapDisplay();
 }
 
-    private Point calcularNovaPosicao(Point posicaoAtual, Point jogadorPosicao) {
-        int dx = Integer.compare(jogadorPosicao.x, posicaoAtual.x);
-        int dy = Integer.compare(jogadorPosicao.y, posicaoAtual.y);
-        return new Point(posicaoAtual.x + dx, posicaoAtual.y + dy);
-    }
+// Método auxiliar para obter o caractere do inimigo no mapa
+private char getEnemyChar(Inimigo inimigo) {
+    if (inimigo instanceof Perseguidor) return ENEMY_S;
+    if (inimigo instanceof Estalador) return ENEMY_E;
+    if (inimigo instanceof Corredor) return ENEMY_C;
+    if (inimigo instanceof Baiacu) return ENEMY_B;
+    return ' ';
+}
 
+private Point calcularNovaPosicao(Point posicaoAtual, Point jogadorPosicao) {
+    int dx = Integer.compare(jogadorPosicao.x, posicaoAtual.x);
+    int dy = Integer.compare(jogadorPosicao.y, posicaoAtual.y);
+    return new Point(posicaoAtual.x + dx, posicaoAtual.y + dy);
+}
+   
     private boolean isValidMove(Point posicao) {
         return posicao.x >= 0 && posicao.x < MAP_SIZE &&
                posicao.y >= 0 && posicao.y < MAP_SIZE &&
                gameMap[posicao.y][posicao.x] != WALL;
     }
 
-    private void checkForItem(int x, int y) {
-        Iterator<Item> it = inventario.iterator();
-        while (it.hasNext()) {
-            Item item = it.next();
-            if (item.getPosicao().equals(new Point(x, y))) {
-                String nomeItem = item.getNome();
-                if (nomeItem.equals("Medicamento")) {
+private void checkForItem(int x, int y) {
+    Iterator<Item> it = inventario.iterator();
+    while (it.hasNext()) {
+        Item item = it.next();
+        if (item.getPosicao().equals(new Point(x, y))) {
+            String nomeItem = item.getNome();
+            switch (nomeItem) {
+                case "Medicamento" -> {
                     int opcao = JOptionPane.showOptionDialog(
                             this,
                             "Você encontrou um Medicamento! Deseja usar agora ou guardar?",
@@ -395,23 +465,24 @@ private void moveEnemies() {
                         jogador.setVida(Math.min(100, jogador.getVida() + 50));
                         JOptionPane.showMessageDialog(this, "Você usou o medicamento e recuperou 50% de vida!");
                     } else {
-                        // Adiciona o medicamento ao inventário sem modificar a lista durante a iteração
-                        SwingUtilities.invokeLater(() -> {
-                            inventario.add(new Item("Medicamento Guardado", new Point(-1, -1)));
-                            JOptionPane.showMessageDialog(this, "Você guardou o medicamento no inventário.");
-                        });
+                        inventario.add(new Item("Medicamento Guardado", new Point(-1, -1)));
+                        JOptionPane.showMessageDialog(this, "Você guardou o medicamento no inventário.");
                     }
-                    // Remove o item da lista com segurança
-                    it.remove();
-                    break;
-                } else {
-                    JOptionPane.showMessageDialog(this, "Você encontrou um " + nomeItem + "!");
-                    it.remove();
-                    break;
+                }
+                case "Arma" -> {
+                    jogador.ganharArma();
+                    JOptionPane.showMessageDialog(this, "Você encontrou uma arma!");
+                }
+                case "Taco de Baseball" -> {
+                    jogador.ganharTaco();
+                    JOptionPane.showMessageDialog(this, "Você encontrou um taco de baseball! Ele substitui o ataque da mão e causa 10% de dano a mais.");
                 }
             }
+            it.remove();
+            break;
         }
     }
+}
 
     private void checkForCombat(int x, int y) {
         for (Inimigo inimigo : inimigos) {
@@ -460,6 +531,97 @@ private void moveEnemies() {
         setContentPane(panel);
         revalidate();
     }
+    
+    public void exibirTelaDerrota() {
+    // Painel principal com layout BorderLayout
+    JPanel panel = new JPanel(new BorderLayout()) {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            // Carrega o GIF de fundo
+            ImageIcon backgroundImage = new ImageIcon("image/defeat_background.gif"); // Substitua pelo caminho do seu GIF
+            g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
+        }
+    };
+
+    // Título "Você foi derrotado!"
+    JLabel titleLabel = new JLabel("Você foi derrotado!", SwingConstants.CENTER);
+    titleLabel.setFont(new Font("Arial", Font.BOLD, 36));
+    titleLabel.setForeground(Color.WHITE);
+    panel.add(titleLabel, BorderLayout.NORTH);
+
+    // Painel para a animação de 6 frames
+    JPanel animationPanel = new JPanel(new BorderLayout());
+    animationPanel.setOpaque(false); // Torna o painel transparente
+
+    // JLabel para exibir a animação
+    JLabel animationLabel = new JLabel();
+    animationLabel.setHorizontalAlignment(SwingConstants.CENTER);
+    animationPanel.add(animationLabel, BorderLayout.CENTER);
+
+    // Adiciona a animação ao painel principal
+    panel.add(animationPanel, BorderLayout.CENTER);
+
+    // Painel para os botões
+    JPanel buttonPanel = new JPanel(new GridBagLayout());
+    buttonPanel.setOpaque(false); // Torna o painel transparente
+
+    // Botões de Reiniciar e Novo Jogo
+    JButton restartButton = new JButton("Reiniciar Jogo");
+    JButton newGameButton = new JButton("Novo Jogo");
+
+    restartButton.addActionListener(e -> reiniciarJogo());
+    newGameButton.addActionListener(e -> novoJogo());
+
+    // Configuração do layout dos botões
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.gridx = 0;
+    gbc.gridy = 0;
+    gbc.insets = new Insets(10, 10, 10, 10); // Espaçamento entre os botões
+    buttonPanel.add(restartButton, gbc);
+
+    gbc.gridy = 1;
+    buttonPanel.add(newGameButton, gbc);
+
+    // Adiciona o painel de botões ao painel principal (parte inferior)
+    panel.add(buttonPanel, BorderLayout.SOUTH);
+
+    // Configura o painel principal como conteúdo da janela
+    setContentPane(panel);
+    revalidate();
+
+    // Inicia a animação de 6 frames
+    startAnimation(animationLabel);
+}
+
+// Método para iniciar a animação de 6 frames
+private void startAnimation(JLabel animationLabel) {
+    String[] frames = {
+        "image/frame1.png", // Substitua pelos caminhos das suas imagens
+        "image/frame2.png",
+        "image/frame3.png",
+        "image/frame4.png",
+        "image/frame5.png",
+        "image/frame6.png"
+    };
+
+    javax.swing.Timer animationTimer = new javax.swing.Timer(100, new ActionListener() { // 100ms por frame
+        int currentFrame = 0;
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (currentFrame >= frames.length) {
+                currentFrame = 0; // Reinicia a animação
+            }
+            // Atualiza a imagem do frame atual
+            ImageIcon frameIcon = new ImageIcon(frames[currentFrame]);
+            animationLabel.setIcon(frameIcon);
+            currentFrame++;
+        }
+    });
+
+    animationTimer.start(); // Inicia o timer da animação
+}
 
     private void reiniciarJogo() {
         loadRandomMap();

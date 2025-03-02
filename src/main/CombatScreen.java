@@ -119,50 +119,50 @@ class CombatScreen extends JDialog {
         setVisible(true);
     }
 
-    private void atacar() {
-        animateAttack(playerLabel, () -> {
-            int opcao = JOptionPane.showOptionDialog(
-                    this,
-                    "Escolha sua forma de ataque:",
-                    "Atacar",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE,
-                    null,
-                    new String[]{"Mão", "Revólver"},
-                    "Mão"
-            );
+private void atacar() {
+    animateAttack(playerLabel, () -> {
+        int opcao = JOptionPane.showOptionDialog(
+                this,
+                "Escolha sua forma de ataque:",
+                "Atacar",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                new String[]{"Mão/Taco", "Revólver"},
+                "Mão/Taco"
+        );
 
-            int dano = 0;
-            if (opcao == JOptionPane.YES_OPTION) {
-                // Ataque com a mão
-                int dado = new Random().nextInt(6) + 1;
-                if (dado == 6) {
-                    dano = inimigo.getVida(); // Golpe crítico elimina o inimigo
-                    JOptionPane.showMessageDialog(this, "Golpe crítico! Você causou " + dano + " de dano.");
+        int dano = 0;
+        if (opcao == JOptionPane.YES_OPTION) {
+            // Ataque com a mão ou taco
+            int dado = new Random().nextInt(6) + 1;
+            if (dado == 6) {
+                dano = inimigo.getVida(); // Golpe crítico elimina o inimigo
+                JOptionPane.showMessageDialog(this, "Golpe crítico! Você causou " + dano + " de dano.");
+            } else {
+                dano = jogador.temTaco() ? 30 : 20; // Dano normal (20% com mão, 30% com taco)
+                JOptionPane.showMessageDialog(this, "Você causou " + dano + " de dano.");
+            }
+        } else {
+            // Ataque com revólver
+            if (jogador.temArma()) {
+                if (inimigo instanceof Corredor || inimigo instanceof Baiacu) {
+                    JOptionPane.showMessageDialog(this, "Não é possível ferir este inimigo com o revólver.");
                 } else {
-                    dano = 20; // Dano normal
-                    JOptionPane.showMessageDialog(this, "Você causou " + dano + " de dano.");
+                    dano = inimigo.getVida();
+                    JOptionPane.showMessageDialog(this, "Golpe crítico com revólver! Você causou " + dano + " de dano.");
+                    jogador.usarMunicao();
                 }
             } else {
-                // Ataque com revólver
-                if (jogador.temArma()) {
-                    if (inimigo instanceof Corredor || inimigo instanceof Baiacu) {
-                        JOptionPane.showMessageDialog(this, "Não é possível ferir este inimigo com o revólver.");
-                    } else {
-                        dano = inimigo.getVida();
-                        JOptionPane.showMessageDialog(this, "Golpe crítico com revólver! Você causou " + dano + " de dano.");
-                        jogador.usarMunicao();
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(this, "Sem arma no momento.");
-                }
+                JOptionPane.showMessageDialog(this, "Sem arma no momento.");
             }
+        }
 
-            inimigo.setVida(inimigo.getVida() - dano);
-            turnoInimigo();
-            verificarFimCombate();
-        });
-    }
+        inimigo.setVida(inimigo.getVida() - dano);
+        turnoInimigo();
+        verificarFimCombate();
+    });
+}
 
     private void curar() {
         animateHeal(playerLabel, () -> {
@@ -202,60 +202,58 @@ class CombatScreen extends JDialog {
         });
     }
 
-    private void verificarFimCombate() {
-        atualizarBarras();
+   private void verificarFimCombate() {
+    atualizarBarras();
 
-        if (inimigo.getVida() <= 0) {
-            JOptionPane.showMessageDialog(this, "Você derrotou o inimigo!");
-            Point inimigoPosition = inimigo.getPosicao();
+    if (inimigo.getVida() <= 0) {
+        JOptionPane.showMessageDialog(this, "Você derrotou o inimigo!");
+        Point inimigoPosition = inimigo.getPosicao();
+        game.getGameMap()[inimigoPosition.y][inimigoPosition.x] = ' ';
+        game.removerInimigo(inimigo);
+        game.updateMapDisplay();
 
-            // Substitui a posição do inimigo por um espaço vazio (' ')
-            game.getGameMap()[inimigoPosition.y][inimigoPosition.x] = ' ';
-            game.removerInimigo(inimigo);
-            game.updateMapDisplay();
-
-            if (game.verificarVitoria()) {
-                game.exibirTelaVitoria();
-            }
-            dispose(); // Fecha a tela de combate
-        } else if (jogador.getVida() <= 0) {
-            JOptionPane.showMessageDialog(this, "Você foi derrotado!");
-            System.exit(0);
+        if (game.verificarVitoria()) {
+            game.exibirTelaVitoria();
         }
+        dispose(); // Fecha a tela de combate
+    } else if (jogador.getVida() <= 0) {
+        JOptionPane.showMessageDialog(this, "Você foi derrotado!");
+        game.exibirTelaDerrota();
     }
+}
 
     private void atualizarBarras() {
         playerHealthBar.setValue(jogador.getVida());
         enemyHealthBar.setValue(inimigo.getVida());
     }
 
-    private void animateAttack(JLabel character, Runnable onFinish) {
-        int frames = 4;
-        String[] attackFrames = {
-                "image/player.png",
-                "image/player2.png",
-                "image/player3.png",
-                "image/player.png"
-        };
+private void animateAttack(JLabel character, Runnable onFinish) {
+    int frames = 4;
+    String[] attackFrames = {
+        "image/player.png",
+        "image/player2.png",
+        "image/player3.png",
+        "image/player.png"
+    };
 
-        animationTimer = new Timer();
-        animationTimer.scheduleAtFixedRate(new TimerTask() {
-            int currentFrame = 0;
+    animationTimer = new Timer();
+    animationTimer.scheduleAtFixedRate(new TimerTask() {
+        int currentFrame = 0;
 
-            @Override
-            public void run() {
-                if (currentFrame >= frames) {
-                    animationTimer.cancel();
-                    SwingUtilities.invokeLater(onFinish);
-                    character.setIcon(new ImageIcon("image/player.png")); // Volta ao estado original
-                } else {
-                    ImageIcon frameIcon = new ImageIcon(attackFrames[currentFrame]);
-                    character.setIcon(frameIcon);
-                    currentFrame++;
-                }
+        @Override
+        public void run() {
+            if (currentFrame >= frames) {
+                animationTimer.cancel();
+                SwingUtilities.invokeLater(onFinish);
+                character.setIcon(new ImageIcon("image/player.png")); // Volta ao estado original
+            } else {
+                ImageIcon frameIcon = new ImageIcon(attackFrames[currentFrame]);
+                character.setIcon(frameIcon);
+                currentFrame++;
             }
-        }, 0, 100); // 100ms por frame
-    }
+        }
+    }, 0, 100); // 100ms por frame
+}
 
     private void animateHeal(JLabel character, Runnable onFinish) {
         int frames = 4;

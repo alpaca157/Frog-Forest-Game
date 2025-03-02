@@ -13,11 +13,12 @@ package main;
 import java.awt.Point;
 
 class Jogador {
-    private int percepcao;
+    public int percepcao;
     private int vida;
     private Point posicao;
     private boolean temArma;
     private int municao;
+    public boolean temTaco;
 
     public Jogador(int percepcao) {
         this.percepcao = percepcao;
@@ -54,6 +55,10 @@ class Jogador {
     public void ganharArma() {
         this.temArma = true;
     }
+    
+    public void ganharTaco() {
+    this.temTaco = true;
+}
 
     public void adicionarMunicao(int quantidade) {
         this.municao += quantidade;
@@ -69,5 +74,9 @@ class Jogador {
 
     public int getMunicao() {
         return municao;
+    }
+
+    boolean temTaco() {
+       return temTaco;
     }
 }
