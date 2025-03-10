@@ -10,8 +10,6 @@ import java.awt.Point;
  *
  * @author Duda
  */
-import java.awt.Point;
-
 class Item {
     private String nome;
     private Point posicao;

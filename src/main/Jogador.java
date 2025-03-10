@@ -26,6 +26,7 @@ class Jogador {
         this.posicao = new Point(0, 0);
         this.temArma = false;
         this.municao = 0;
+        this.temTaco = false;
     }
 
     public int getPercepcao() {
@@ -52,13 +53,15 @@ class Jogador {
         return temArma;
     }
 
-    public void ganharArma() {
-        this.temArma = true;
+    // Método modificado para aceitar um parâmetro booleano
+    public void ganharArma(boolean temArma) {
+        this.temArma = temArma;
     }
-    
-    public void ganharTaco() {
-    this.temTaco = true;
-}
+
+    // Método modificado para aceitar um parâmetro booleano
+    public void ganharTaco(boolean temTaco) {
+        this.temTaco = temTaco;
+    }
 
     public void adicionarMunicao(int quantidade) {
         this.municao += quantidade;
@@ -77,6 +80,14 @@ class Jogador {
     }
 
     boolean temTaco() {
-       return temTaco;
+        return temTaco;
+    }
+
+    boolean ganharArma() {
+        return temArma;
+    }
+
+    boolean ganharTaco() {
+        return temTaco;
     }
 }

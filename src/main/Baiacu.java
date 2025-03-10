@@ -10,7 +10,7 @@ import java.awt.Point;
  *
  * @author Duda
  */
-public class Baiacu extends Inimigo {
+class Baiacu extends Inimigo {
     public Baiacu(Point posicao, int vida) {
         super(posicao, vida);
     }

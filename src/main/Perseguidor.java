@@ -10,7 +10,7 @@ import java.awt.Point;
  *
  * @author Duda
  */
-public class Perseguidor extends Inimigo {
+class Perseguidor extends Inimigo {
     public Perseguidor(Point posicao, int vida) {
         super(posicao, vida);
     }

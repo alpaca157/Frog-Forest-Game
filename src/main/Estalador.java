@@ -10,7 +10,7 @@ import java.awt.Point;
  *
  * @author Duda
  */
-public class Estalador extends Inimigo {
+class Estalador extends Inimigo {
     public Estalador(Point posicao, int vida) {
         super(posicao, vida);
     }

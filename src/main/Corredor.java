@@ -10,7 +10,7 @@ import java.awt.Point;
  *
  * @author Duda
  */
-public class Corredor extends Inimigo {
+class Corredor extends Inimigo {
     public Corredor(Point posicao, int vida) {
         super(posicao, vida);
     }

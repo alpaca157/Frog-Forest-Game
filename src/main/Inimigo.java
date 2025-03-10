@@ -10,7 +10,7 @@ package main;
  */
 import java.awt.Point;
 
-public abstract class Inimigo {
+abstract class Inimigo {
     public Point posicao;
     private int vida;
 
@@ -36,5 +36,4 @@ public abstract class Inimigo {
     }
 
     public abstract void mover(char[][] mapa, Point jogadorPosicao);
-
 }
