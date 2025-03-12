@@ -181,7 +181,6 @@ private void curar() {
         game.updateStatusPanel(); // Atualiza o painel de status
     });
 }
-
     private void fugir() {
         Point posicaoAtual = jogador.getPosicao();
         Point[] posicoesAdjacentes = {
@@ -203,16 +202,13 @@ private void curar() {
     }
 
 private void turnoInimigo() {
-    if (inimigo.getVida() > 0) { // Verifica se o inimigo ainda está vivo
-        animateAttack(enemyLabel, () -> {
-            int danoInimigo = new Random().nextInt(10) + 10; // Dano aleatório entre 10 e 20
-            jogador.setVida(jogador.getVida() - danoInimigo);
-            JOptionPane.showMessageDialog(this, "O inimigo te atacou causando " + danoInimigo + " de dano!");
-            verificarFimCombate(); // Verifica se o jogador morreu após o ataque
-        });
-    } else {
-        verificarFimCombate(); // Se o inimigo morreu, verifica o fim do combate
-    }
+    animateAttack(enemyLabel, () -> {
+        int danoInimigo = new Random().nextInt(10) + 10; // Dano aleatório entre 10 e 20
+        jogador.setVida(jogador.getVida() - danoInimigo);
+        JOptionPane.showMessageDialog(this, "O inimigo te atacou causando " + danoInimigo + " de dano!");
+        verificarFimCombate();
+        game.updateStatusPanel(); // Atualiza o painel de status
+    });
 }
 
 private void verificarFimCombate() {
@@ -221,9 +217,10 @@ private void verificarFimCombate() {
     if (inimigo.getVida() <= 0) {
         JOptionPane.showMessageDialog(this, "Você derrotou o inimigo!");
         Point inimigoPosition = inimigo.getPosicao();
-        game.getGameMap()[inimigoPosition.y][inimigoPosition.x] = ' '; // Remove o inimigo do mapa
+        game.getGameMap()[inimigoPosition.y][inimigoPosition.x] = ' ';
         game.removerInimigo(inimigo);
         game.updateMapDisplay();
+        game.updateStatusPanel(); // Atualiza o painel de status
 
         if (game.verificarVitoria()) {
             game.exibirTelaVitoria();

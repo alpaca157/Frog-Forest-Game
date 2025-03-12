@@ -484,6 +484,7 @@ public void updateStatusPanel() {
                         if (opcao == JOptionPane.YES_OPTION) {
                             jogador.setVida(Math.min(100, jogador.getVida() + 50));
                             JOptionPane.showMessageDialog(this, "Você usou o medicamento e recuperou 50% de vida!");
+                            updateStatusPanel();
                         } else {
                             inventario.add(new Item("Medicamento Guardado", new Point(-1, -1)));
                             JOptionPane.showMessageDialog(this, "Você guardou o medicamento no inventário.");
@@ -522,126 +523,151 @@ public void updateStatusPanel() {
         return inimigos.isEmpty();
     }
 
-    public void exibirTelaVitoria() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
+public void exibirTelaVitoria() {
+    JPanel panel = new JPanel() {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            ImageIcon backgroundImage = new ImageIcon("image/screen3.jpg"); // Usa o mesmo fundo da tela inicial
+            g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
+        }
+    };
+    panel.setLayout(new BorderLayout());
 
-        JLabel titleLabel = new JLabel("Você venceu o jogo!", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 36));
-        titleLabel.setForeground(Color.WHITE);
-        panel.add(titleLabel, BorderLayout.NORTH);
+    JLabel titleLabel = new JLabel("Você venceu o jogo!", SwingConstants.CENTER);
+    titleLabel.setFont(new Font("Arial", Font.BOLD, 36));
+    titleLabel.setForeground(Color.WHITE);
 
-        JPanel optionsPanel = new JPanel();
-        optionsPanel.setOpaque(false);
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
-        optionsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+    JPanel centerPanel = new JPanel(new GridBagLayout());
+    centerPanel.setOpaque(false);
+    centerPanel.add(titleLabel);
 
-        JButton restartButton = new JButton("Reiniciar Jogo");
-        JButton newGameButton = new JButton("Novo Jogo");
+    panel.add(centerPanel, BorderLayout.CENTER);
 
-        restartButton.addActionListener(e -> reiniciarJogo());
-        newGameButton.addActionListener(e -> novoJogo());
+    JPanel bottomPanel = new JPanel(new GridBagLayout());
+    bottomPanel.setOpaque(false);
+    bottomPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        optionsPanel.add(restartButton);
-        optionsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        optionsPanel.add(newGameButton);
+    JButton restartButton = new JButton("Reiniciar Jogo");
+    JButton newGameButton = new JButton("Novo Jogo");
 
-        panel.add(optionsPanel, BorderLayout.CENTER);
+    restartButton.addActionListener(e -> reiniciarJogo());
+    newGameButton.addActionListener(e -> novoJogo());
 
-        setContentPane(panel);
-        revalidate();
-    }
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.gridx = 0;
+    gbc.gridy = 0;
+    gbc.insets = new Insets(5, 5, 5, 5);
+    gbc.anchor = GridBagConstraints.CENTER;
 
-    public void exibirTelaDerrota() {
-        // Painel principal com layout BorderLayout
-        JPanel panel = new JPanel(new BorderLayout()) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                // Carrega o GIF de fundo
-                ImageIcon backgroundImage = new ImageIcon("image/defeat_background.gif");
-                g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
-            }
-        };
+    bottomPanel.add(restartButton, gbc);
 
-        // Título "Você foi derrotado!"
-        JLabel titleLabel = new JLabel("Você foi derrotado!", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 36));
-        titleLabel.setForeground(Color.WHITE);
-        panel.add(titleLabel, BorderLayout.NORTH);
+    gbc.gridy = 1;
+    bottomPanel.add(newGameButton, gbc);
 
-        // Painel para a animação de 6 frames
-        JPanel animationPanel = new JPanel(new BorderLayout());
-        animationPanel.setOpaque(false); // Torna o painel transparente
+    panel.add(bottomPanel, BorderLayout.SOUTH);
 
-        // JLabel para exibir a animação
-        JLabel animationLabel = new JLabel();
-        animationLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        animationPanel.add(animationLabel, BorderLayout.CENTER);
+    setContentPane(panel);
+    revalidate();
+}
 
-        // Adiciona a animação ao painel principal
-        panel.add(animationPanel, BorderLayout.CENTER);
+public void exibirTelaDerrota() {
+    // Painel principal com layout BorderLayout
+    JPanel panel = new JPanel(new BorderLayout()) {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            // Carrega o GIF de fundo
+            ImageIcon backgroundImage = new ImageIcon("image/screen3.jpg");
+            g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
+        }
+    };
 
-        // Painel para os botões
-        JPanel buttonPanel = new JPanel(new GridBagLayout());
-        buttonPanel.setOpaque(false); // Torna o painel transparente
+    // Título "Você foi derrotado!"
+    JLabel titleLabel = new JLabel("Você foi derrotado!", SwingConstants.CENTER);
+    titleLabel.setFont(new Font("Arial", Font.BOLD, 36));
+    titleLabel.setForeground(Color.WHITE);
+    panel.add(titleLabel, BorderLayout.NORTH); // Título no topo (centro)
 
-        // Botões de Reiniciar e Novo Jogo
-        JButton restartButton = new JButton("Reiniciar Jogo");
-        JButton newGameButton = new JButton("Novo Jogo");
+    // Painel para a animação de 6 frames
+    JPanel animationPanel = new JPanel(new GridBagLayout()); // Usa GridBagLayout para centralizar
+    animationPanel.setOpaque(false); // Torna o painel transparente
 
-        restartButton.addActionListener(e -> reiniciarJogo());
-        newGameButton.addActionListener(e -> novoJogo());
+    // JLabel para exibir a animação
+    JLabel animationLabel = new JLabel();
+    animationLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        // Configuração do layout dos botões
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.insets = new Insets(10, 10, 10, 10); // Espaçamento entre os botões
-        buttonPanel.add(restartButton, gbc);
+    // Adiciona a animação ao painel de animação (centralizado)
+    GridBagConstraints gbcAnimation = new GridBagConstraints();
+    gbcAnimation.gridx = 0;
+    gbcAnimation.gridy = 0;
+    gbcAnimation.anchor = GridBagConstraints.CENTER;
+    animationPanel.add(animationLabel, gbcAnimation);
 
-        gbc.gridy = 1;
-        buttonPanel.add(newGameButton, gbc);
+    // Adiciona o painel de animação ao centro do painel principal
+    panel.add(animationPanel, BorderLayout.CENTER);
 
-        // Adiciona o painel de botões ao painel principal (parte inferior)
-        panel.add(buttonPanel, BorderLayout.SOUTH);
+    // Painel para os botões
+    JPanel buttonPanel = new JPanel(new GridBagLayout());
+    buttonPanel.setOpaque(false); // Torna o painel transparente
 
-        // Configura o painel principal como conteúdo da janela
-        setContentPane(panel);
-        revalidate();
+    // Botões de Reiniciar e Novo Jogo
+    JButton restartButton = new JButton("Reiniciar Jogo");
+    JButton newGameButton = new JButton("Novo Jogo");
 
-        // Inicia a animação de 6 frames
-        startAnimation(animationLabel);
-    }
+    restartButton.addActionListener(e -> reiniciarJogo());
+    newGameButton.addActionListener(e -> novoJogo());
+
+    // Configuração do layout dos botões
+    GridBagConstraints gbcButtons = new GridBagConstraints();
+    gbcButtons.gridx = 0;
+    gbcButtons.gridy = 0;
+    gbcButtons.insets = new Insets(10, 10, 10, 10); // Espaçamento entre os botões
+    gbcButtons.anchor = GridBagConstraints.CENTER;
+    buttonPanel.add(restartButton, gbcButtons);
+
+    gbcButtons.gridy = 1;
+    buttonPanel.add(newGameButton, gbcButtons);
+
+    // Adiciona o painel de botões ao painel principal (parte inferior)
+    panel.add(buttonPanel, BorderLayout.SOUTH);
+
+    // Configura o painel principal como conteúdo da janela
+    setContentPane(panel);
+    revalidate();
+
+    // Inicia a animação de 6 frames
+    startAnimation(animationLabel);
+}
 
     // Método para iniciar a animação de 6 frames
-    private void startAnimation(JLabel animationLabel) {
-        String[] frames = {
-            "image/frame1.png", // Substitua pelos caminhos das suas imagens
-            "image/frame2.png",
-            "image/frame3.png",
-            "image/frame4.png",
-            "image/frame5.png",
-            "image/frame6.png"
-        };
+private void startAnimation(JLabel animationLabel) {
+    String[] frames = {
+        "image/frame1.png", // Substitua pelos caminhos das suas imagens
+        "image/frame2.png",
+        "image/frame3.png",
+        "image/frame4.png",
+        "image/frame5.png",
+        "image/frame6.png"
+    };
 
-        javax.swing.Timer animationTimer = new javax.swing.Timer(100, new ActionListener() { // 100ms por frame
-            int currentFrame = 0;
+    javax.swing.Timer animationTimer = new javax.swing.Timer(100, new ActionListener() { // 100ms por frame
+        int currentFrame = 0;
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (currentFrame >= frames.length) {
-                    currentFrame = 0; // Reinicia a animação
-                }
-                // Atualiza a imagem do frame atual
-                ImageIcon frameIcon = new ImageIcon(frames[currentFrame]);
-                animationLabel.setIcon(frameIcon);
-                currentFrame++;
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (currentFrame >= frames.length) {
+                currentFrame = 0; // Reinicia a animação
             }
-        });
+            // Atualiza a imagem do frame atual
+            ImageIcon frameIcon = new ImageIcon(frames[currentFrame]);
+            animationLabel.setIcon(frameIcon);
+            currentFrame++;
+        }
+    });
 
-        animationTimer.start(); // Inicia o timer da animação
-    }
+    animationTimer.start(); // Inicia o timer da animação
+}
 
     private void reiniciarJogo() {
         jogador.setVida(100);
