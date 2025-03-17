@@ -5,6 +5,7 @@
 package main;
 
 import java.awt.Point;
+import java.util.Set;
 
 /**
  *
@@ -16,17 +17,9 @@ class Corredor extends Inimigo {
     }
 
     @Override
-    public void mover(char[][] mapa, Point jogadorPosicao) {
+    public void mover(char[][] mapa, Point jogadorPosicao, Set<Point> posicoesInimigos) {
         for (int i = 0; i < 2; i++) { // Move duas vezes
-            int dx = Integer.compare(jogadorPosicao.x, posicao.x);
-            int dy = Integer.compare(jogadorPosicao.y, posicao.y);
-            Point novaPosicao = new Point(posicao.x + dx, posicao.y + dy);
-
-            if (novaPosicao.x >= 0 && novaPosicao.x < mapa[0].length &&
-                novaPosicao.y >= 0 && novaPosicao.y < mapa.length &&
-                mapa[novaPosicao.y][novaPosicao.x] == 'V') { // 'V' representa caminho livre
-                posicao = novaPosicao;
-            }
+            super.mover(mapa, jogadorPosicao, posicoesInimigos);
         }
     }
 }

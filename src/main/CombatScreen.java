@@ -221,6 +221,7 @@ private void verificarFimCombate() {
         game.removerInimigo(inimigo);
         game.updateMapDisplay();
         game.updateStatusPanel(); // Atualiza o painel de status
+        game.atualizarVisao(); // Atualiza a visão do jogador
 
         if (game.verificarVitoria()) {
             game.exibirTelaVitoria();

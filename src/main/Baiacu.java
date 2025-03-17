@@ -5,6 +5,7 @@
 package main;
 
 import java.awt.Point;
+import java.util.Set;
 
 /**
  *
@@ -16,7 +17,7 @@ class Baiacu extends Inimigo {
     }
 
     @Override
-    public void mover(char[][] mapa, Point jogadorPosicao) {
+    public void mover(char[][] mapa, Point jogadorPosicao, Set<Point> posicoesInimigos) {
         // O baiacu não se move
     }
 }

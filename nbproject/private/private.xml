@@ -3,10 +3,13 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Duda/Desktop/Javinha/Main/src/main/Item.java</file>
+            <file>file:/C:/Users/Duda/Desktop/Javinha/Main/src/main/Inimigo.java</file>
+            <file>file:/C:/Users/Duda/Desktop/Javinha/Main/src/main/Corredor.java</file>
             <file>file:/C:/Users/Duda/Desktop/Javinha/Main/src/main/CombatScreen.java</file>
-            <file>file:/C:/Users/Duda/Desktop/Javinha/Main/src/main/Jogador.java</file>
+            <file>file:/C:/Users/Duda/Desktop/Javinha/Main/src/main/Baiacu.java</file>
             <file>file:/C:/Users/Duda/Desktop/Javinha/Main/src/main/FrogForestGame.java</file>
+            <file>file:/C:/Users/Duda/Desktop/Javinha/Main/src/main/Perseguidor.java</file>
+            <file>file:/C:/Users/Duda/Desktop/Javinha/Main/src/main/Estalador.java</file>
         </group>
     </open-files>
 </project-private>
