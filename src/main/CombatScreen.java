@@ -174,7 +174,7 @@ private void atacar() {
 
 private void curar() {
     animateHeal(playerLabel, () -> {
-        jogador.setVida(Math.min(100, jogador.getVida() + 15));
+        jogador.setVida(Math.min(100, jogador.getVida() + 20));
         JOptionPane.showMessageDialog(this, "Você se curou!");
         turnoInimigo();
         verificarFimCombate();
@@ -239,14 +239,65 @@ private void verificarFimCombate() {
         enemyHealthBar.setValue(inimigo.getVida());
     }
 
-private void animateAttack(JLabel character, Runnable onFinish) {
-    int frames = 4;
-    String[] attackFrames = {
-        "image/player.png",  // Frame inicial (personagem parado)
-        "image/player2.png", // Frame de ataque 1
-        "image/player3.png", // Frame de ataque 2
-        "image/player.png"   // Frame final (personagem parado)
-    };
+private void animateAttack(JLabel attackerLabel, Runnable onFinish) {
+    // Define os frames de ataque com base no personagem (jogador ou inimigo)
+    final String[] attackFrames; // Variável final para os frames
+    final String originalIconPath; // Caminho do ícone original
+
+    if (attackerLabel == playerLabel) {
+        // Frames de ataque do jogador
+        attackFrames = new String[] {
+            "image/player.png",  // Frame inicial (personagem parado)
+            "image/player2.png", // Frame de ataque 1
+            "image/player3.png", // Frame de ataque 2
+            "image/player.png"   // Frame final (personagem parado)
+        };
+        originalIconPath = "image/player.png"; // Ícone original do jogador
+    } else {
+        // Frames de ataque do inimigo (dependendo do tipo de inimigo)
+        if (inimigo instanceof Perseguidor) {
+            attackFrames = new String[] {
+                "image/enemy1.png",         // Frame inicial (inimigo parado)
+                "image/enemy1_1.png",        // Frame de ataque 1
+                "image/enemy1_2.png",        // Frame de ataque 2
+                "image/enemy1.png"           // Frame final (inimigo parado)
+            };
+            originalIconPath = "image/enemy1.png"; // Ícone original do Perseguidor
+        } else if (inimigo instanceof Estalador) {
+            attackFrames = new String[] {
+                "image/enemy2.png",         // Frame inicial (inimigo parado)
+                "image/enemy2_1.png",        // Frame de ataque 1
+                "image/enemy2_2.png",        // Frame de ataque 2
+                "image/enemy2.png"           // Frame final (inimigo parado)
+            };
+            originalIconPath = "image/enemy2.png"; // Ícone original do Estalador
+        } else if (inimigo instanceof Corredor) {
+            attackFrames = new String[] {
+                "image/enemy3.png",         // Frame inicial (inimigo parado)
+                "image/enemy3_1.png",        // Frame de ataque 1
+                "image/enemy3_2.png",        // Frame de ataque 2
+                "image/enemy3.png"           // Frame final (inimigo parado)
+            };
+            originalIconPath = "image/enemy3.png"; // Ícone original do Corredor
+        } else if (inimigo instanceof Baiacu) {
+            attackFrames = new String[] {
+                "image/enemy4.png",         // Frame inicial (inimigo parado)
+                "image/enemy4_1.png",       // Frame de ataque 1
+                "image/enemy4_2.png",       // Frame de ataque 2
+                "image/enemy4.png"          // Frame final (inimigo parado)
+            };
+            originalIconPath = "image/enemy4.png"; // Ícone original do Baiacu
+        } else {
+            // Caso padrão (não deve acontecer)
+            attackFrames = new String[] {
+                "image/enemy1.png",         // Frame inicial (inimigo parado)
+                "image/enemy1_1.png",       // Frame de ataque 1
+                "image/enemy1_2.png",       // Frame de ataque 2
+                "image/enemy1.png"          // Frame final (inimigo parado)
+            };
+            originalIconPath = "image/enemy1.png"; // Ícone original padrão
+        }
+    }
 
     animationTimer = new Timer();
     animationTimer.scheduleAtFixedRate(new TimerTask() {
@@ -254,23 +305,24 @@ private void animateAttack(JLabel character, Runnable onFinish) {
 
         @Override
         public void run() {
-            if (currentFrame >= frames) {
+            if (currentFrame >= attackFrames.length) {
                 animationTimer.cancel(); // Para o timer quando a animação termina
                 SwingUtilities.invokeLater(() -> {
-                    character.setIcon(new ImageIcon("image/player.png")); // Restaura o ícone original
+                    // Restaura o ícone original do atacante
+                    attackerLabel.setIcon(new ImageIcon(originalIconPath));
                     onFinish.run(); // Executa o código após a animação
                 });
             } else {
-                // Atualiza o ícone do personagem com o frame atual
+                // Atualiza o ícone do atacante com o frame atual
                 ImageIcon frameIcon = new ImageIcon(attackFrames[currentFrame]);
-                character.setIcon(frameIcon);
+                attackerLabel.setIcon(frameIcon);
                 currentFrame++;
             }
         }
     }, 0, 100); // 100ms por frame
 }
 
-    private void animateHeal(JLabel character, Runnable onFinish) {
+private void animateHeal(JLabel character, Runnable onFinish) {
         int frames = 4;
         String[] healFrames = {
                 "image/player.png",

@@ -89,13 +89,13 @@ private void showWelcomeScreen() {
     // Subtítulo "Escolha a dificuldade:" com a fonte personalizada e cor #abcc85
     JLabel difficultyLabel = new JLabel("Escolha a dificuldade:", SwingConstants.CENTER);
     try {
-        Font akayaFont = Font.createFont(Font.TRUETYPE_FONT, new File("fontes/AkayaKanadaka-regular.ttf")).deriveFont(24f);
+        Font akayaFont = Font.createFont(Font.TRUETYPE_FONT, new File("fontes/Silkscreen-Bold.ttf")).deriveFont(24f);
         difficultyLabel.setFont(akayaFont);
     } catch (IOException | FontFormatException e) {
         e.printStackTrace();
         difficultyLabel.setFont(new Font("Arial", Font.PLAIN, 24)); // Fallback para Arial
     }
-    difficultyLabel.setForeground(new Color(0x263810)); // Cor #abcc85
+    difficultyLabel.setForeground(new Color(0x000000));
 
     JButton easyButton = new JButton("Fácil");
     JButton mediumButton = new JButton("Médio");
@@ -537,27 +537,13 @@ private void moveEnemies() {
             posicoesInimigos.remove(posicaoAtual); // Remove a posição atual do inimigo temporariamente
 
             // Move o inimigo
-            Point novaPosicao = calcularNovaPosicao(posicaoAtual, jogador.getPosicao());
-            if (!novaPosicao.equals(posicaoAtual) && isValidMove(novaPosicao) && !isPositionOccupied(novaPosicao)) {
-                // Limpa a posição anterior do inimigo
-                gameMap[posicaoAtual.y][posicaoAtual.x] = PATH;
+            inimigo.mover(gameMap, playerPosition, posicoesInimigos);
 
-                // Move o inimigo para a nova posição
-                inimigo.setPosicao(novaPosicao);
-                gameMap[novaPosicao.y][novaPosicao.x] = getEnemyChar(inimigo);
+            // Atualiza a posição no mapa
+            gameMap[posicaoAtual.y][posicaoAtual.x] = 'V'; // Limpa a posição anterior
+            gameMap[inimigo.getPosicao().y][inimigo.getPosicao().x] = getEnemyChar(inimigo);
 
-                // Corredor move duas vezes
-                if (inimigo instanceof Corredor) {
-                    novaPosicao = calcularNovaPosicao(novaPosicao, jogador.getPosicao());
-                    if (isValidMove(novaPosicao) && !isPositionOccupied(novaPosicao)) {
-                        gameMap[inimigo.getPosicao().y][inimigo.getPosicao().x] = PATH;
-                        inimigo.setPosicao(novaPosicao);
-                        gameMap[novaPosicao.y][novaPosicao.x] = getEnemyChar(inimigo);
-                    }
-                }
-            }
-
-            posicoesInimigos.add(novaPosicao); // Adiciona a nova posição ao conjunto
+            posicoesInimigos.add(inimigo.getPosicao()); // Adiciona a nova posição ao conjunto
         }
     }
 

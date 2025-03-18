@@ -37,54 +37,57 @@ abstract class Inimigo {
         this.vida = Math.max(0, vida);
     }
 
-public void mover(char[][] mapa, Point jogadorPosicao, Set<Point> posicoesInimigos) {
-    posicao = buscarCaminho(mapa, jogadorPosicao, posicoesInimigos);
-}
-
-private Point buscarCaminho(char[][] mapa, Point jogadorPosicao, Set<Point> posicoesInimigos) {
-    Queue<Point> fila = new LinkedList<>();
-    Map<Point, Point> caminho = new HashMap<>();
-    Set<Point> visitados = new HashSet<>();
-
-    fila.add(posicao);
-    visitados.add(posicao);
-
-    int[][] direcoes = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
-
-    while (!fila.isEmpty()) {
-        Point atual = fila.poll();
-
-        if (atual.equals(jogadorPosicao)) break;
-
-        for (int[] dir : direcoes) {
-            Point vizinho = new Point(atual.x + dir[0], atual.y + dir[1]);
-
-            if (ehValido(mapa, vizinho, posicoesInimigos) && !visitados.contains(vizinho)) {
-                fila.add(vizinho);
-                visitados.add(vizinho);
-                caminho.put(vizinho, atual);
-            }
+    public void mover(char[][] mapa, Point jogadorPosicao, Set<Point> posicoesInimigos) {
+        Point novaPosicao = buscarCaminho(mapa, jogadorPosicao, posicoesInimigos);
+        if (!novaPosicao.equals(posicao)) {
+            posicao = novaPosicao;
         }
     }
 
-    return reconstruirCaminho(caminho, jogadorPosicao);
-}
+    private Point buscarCaminho(char[][] mapa, Point jogadorPosicao, Set<Point> posicoesInimigos) {
+        Queue<Point> fila = new LinkedList<>();
+        Map<Point, Point> caminho = new HashMap<>();
+        Set<Point> visitados = new HashSet<>();
 
-private boolean ehValido(char[][] mapa, Point p, Set<Point> posicoesInimigos) {
-    return p.x >= 0 && p.x < mapa[0].length &&
-           p.y >= 0 && p.y < mapa.length &&
-           (mapa[p.y][p.x] == 'V' || mapa[p.y][p.x] == 'P') && // 'V' = caminho livre, 'P' = jogador
-           !posicoesInimigos.contains(p); // Evita colisões com outros inimigos
-}
+        fila.add(posicao);
+        visitados.add(posicao);
 
-private Point reconstruirCaminho(Map<Point, Point> caminho, Point destino) {
-    if (!caminho.containsKey(destino)) return posicao; // Retorna a posição atual se não houver caminho
+        int[][] direcoes = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
 
-    Point passo = destino;
-    while (caminho.get(passo) != null && !caminho.get(passo).equals(posicao)) {
-        passo = caminho.get(passo);
+        while (!fila.isEmpty()) {
+            Point atual = fila.poll();
+
+            if (atual.equals(jogadorPosicao)) break;
+
+            for (int[] dir : direcoes) {
+                Point vizinho = new Point(atual.x + dir[0], atual.y + dir[1]);
+
+                if (ehValido(mapa, vizinho, posicoesInimigos) && !visitados.contains(vizinho)) {
+                    fila.add(vizinho);
+                    visitados.add(vizinho);
+                    caminho.put(vizinho, atual);
+                }
+            }
+        }
+
+        return reconstruirCaminho(caminho, jogadorPosicao);
     }
 
-    return passo;
-}
+    private boolean ehValido(char[][] mapa, Point p, Set<Point> posicoesInimigos) {
+        return p.x >= 0 && p.x < mapa[0].length &&
+               p.y >= 0 && p.y < mapa.length &&
+               (mapa[p.y][p.x] == 'V' || mapa[p.y][p.x] == 'P') && // 'V' = caminho livre, 'P' = jogador
+               !posicoesInimigos.contains(p); // Evita colisões com outros inimigos
+    }
+
+    private Point reconstruirCaminho(Map<Point, Point> caminho, Point destino) {
+        if (!caminho.containsKey(destino)) return posicao; // Retorna a posição atual se não houver caminho
+
+        Point passo = destino;
+        while (caminho.get(passo) != null && !caminho.get(passo).equals(posicao)) {
+            passo = caminho.get(passo);
+        }
+
+        return passo;
+    }
 }
