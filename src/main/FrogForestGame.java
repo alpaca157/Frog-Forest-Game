@@ -37,6 +37,7 @@ public class FrogForestGame extends JFrame {
     private static final char ITEM = 'I';   // Item
     private JPanel statusPanel;
     public Font customFont;
+    
 
     public FrogForestGame() {
                 try {
@@ -59,6 +60,7 @@ public class FrogForestGame extends JFrame {
 
         showWelcomeScreen();
     }
+    
 
 private void showWelcomeScreen() {
     JPanel panel = new JPanel() {
@@ -128,6 +130,7 @@ private void showWelcomeScreen() {
     revalidate();
 }
 
+
 private void showMainMenu(int difficultyIndex) {
     JPanel panel = new JPanel() {
         @Override
@@ -185,6 +188,7 @@ private void showMainMenu(int difficultyIndex) {
     revalidate();
 }
 
+
     private void startGame(boolean debugMode, int difficultyIndex) {
         this.debugMode = debugMode;
         int playerPerception = switch (difficultyIndex) {
@@ -201,6 +205,7 @@ private void showMainMenu(int difficultyIndex) {
         initGameInterface();
     }
 
+    
     private void loadRandomMap() {
         File mapDir = new File("maps");
         File[] mapFiles = mapDir.listFiles((dir, name) -> name.endsWith(".txt"));
