@@ -334,20 +334,20 @@ private void initGameInterface() {
                     // Define a imagem com base no caractere do mapa
                     ImageIcon icon = null;
                     switch (cell) {
-                        case PLAYER -> icon = new ImageIcon("image/player.png");
+                        case PLAYER -> icon = new ImageIcon("image/playerT.png");
                         case WALL -> icon = new ImageIcon("image/tree.png");
                         case ENEMY_S -> {
                             if (debugMode) {
-                                icon = new ImageIcon("image/enemy1.png");
+                                icon = new ImageIcon("image/enemy1T.png");
                             } else {
                                 icon = new ImageIcon("image/bush.png"); // Perseguidor invisível
                             }
                         }
-                        case ENEMY_E -> icon = new ImageIcon("image/enemy2.png");
-                        case ENEMY_C -> icon = new ImageIcon("image/enemy3.png");
-                        case ENEMY_B -> icon = new ImageIcon("image/enemy4.png");
+                        case ENEMY_E -> icon = new ImageIcon("image/enemy2T.png");
+                        case ENEMY_C -> icon = new ImageIcon("image/enemy3T.png");
+                        case ENEMY_B -> icon = new ImageIcon("image/enemy4T.png");
                         case ITEM -> icon = new ImageIcon("image/item.png");
-                        case PATH -> icon = new ImageIcon("image/path.png");
+                        case PATH -> icon = new ImageIcon("image/path.jpg");
                         default -> icon = new ImageIcon("image/bush.png");
                     }
                     cellLabel.setIcon(icon);
@@ -359,7 +359,7 @@ private void initGameInterface() {
         }
 
         // Atualiza a posição do jogador
-        mapLabels[playerPosition.y][playerPosition.x].setIcon(new ImageIcon("image/player.png"));
+        mapLabels[playerPosition.y][playerPosition.x].setIcon(new ImageIcon("image/playerT.png"));
     }
 
 private boolean isCellVisible(int row, int col) {
@@ -433,7 +433,7 @@ public void atualizarVisao() {
             }
         }
     }
-    mapLabels[x][y].setIcon(new ImageIcon("image/player.png"));
+    mapLabels[x][y].setIcon(new ImageIcon("image/playerT.ng"));
 
     // Visão à direita (leste)
     for (int j = y + 1; j < MAP_SIZE; j++) {
@@ -477,17 +477,17 @@ private ImageIcon getCellIcon(char cell) {
         case WALL:
             return new ImageIcon("image/tree.png"); // Parede
         case ENEMY_S:
-            return new ImageIcon("image/enemy1.png"); // Perseguidor
+            return new ImageIcon("image/enemy1T.png"); // Perseguidor
         case ENEMY_E:
-            return new ImageIcon("image/enemy2.png"); // Estalador
+            return new ImageIcon("image/enemy2T.png"); // Estalador
         case ENEMY_C:
-            return new ImageIcon("image/enemy3.png"); // Corredor
+            return new ImageIcon("image/enemy3T.png"); // Corredor
         case ENEMY_B:
-            return new ImageIcon("image/enemy4.png"); // Baiacu
+            return new ImageIcon("image/enemy4T.png"); // Baiacu
         case ITEM:
             return new ImageIcon("image/item.png"); // Item
         case PATH:
-            return new ImageIcon("image/path.png"); // Caminho livre
+            return new ImageIcon("image/path.jpg"); // Caminho livre
         default:
             return new ImageIcon("image/bush.png"); // Arbusto (visão bloqueada)
     }
